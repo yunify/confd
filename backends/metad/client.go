@@ -123,6 +123,8 @@ func (c *Client) WatchPrefix(prefix string, keys []string, waitIndex uint64, sto
 		c.waitIndex = 1
 		return c.waitIndex, nil
 	}
+	done := make(chan struct{})
+	defer close(done)
 
 	req, _ := http.NewRequest("GET", fmt.Sprintf("%s%s?wait=true", c.url, prefix), nil)
 	req.Header.Set("Accept", "application/json")
@@ -131,11 +133,14 @@ func (c *Client) WatchPrefix(prefix string, keys []string, waitIndex uint64, sto
 		select {
 		case <-stopChan:
 			c.transport.CancelRequest(req)
+		case <-done:
+			return
 		}
 	}()
 
 	// just ignore resp, notify confd to reload metadata from metad
-	_, err := c.httpClient.Do(req)
+	resp, err := c.httpClient.Do(req)
+	defer resp.Body.Close()
 	if err != nil {
 		return c.waitIndex, err
 	}
