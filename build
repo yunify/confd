@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
 
+source ./env
+
+gen_version
+
 echo "Building confd..."
 mkdir -p bin
 go build -o bin/confd .
+
+revert_version

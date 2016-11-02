@@ -1,3 +1,4 @@
 package main
 
-const Version = "0.12.0-dev"
+const VERSION = "0.12.0-dev"
+const GIT_VERSION = "head"

@@ -15,7 +15,8 @@ import (
 func main() {
 	flag.Parse()
 	if printVersion {
-		fmt.Printf("confd %s\n", Version)
+		fmt.Printf("confd %s\n", VERSION)
+		fmt.Printf("git_version %s\n", GIT_VERSION)
 		os.Exit(0)
 	}
 	if err := initConfig(); err != nil {

@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+
+ORG_PATH="github.com/yunify"
+REPO_PATH="${ORG_PATH}/confd"
+
+function gen_version {
+VERSION=${TRAVIS_TAG:-0.12.0-dev}
+GIT_VERSION=$(git rev-parse --verify -q HEAD)
+cp version.go version.go.bak
+cat <<EOT > version.go
+package main
+
+const VERSION = "$VERSION"
+const GIT_VERSION = "$GIT_VERSION"
+EOT
+}
+
+function revert_version {
+    cat version.go.bak > version.go
+    rm version.go.bak
+}

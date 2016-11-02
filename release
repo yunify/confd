@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+source ./env
+
+gen_version
+
+echo "Release confd linux version ..."
+mkdir -p bin/linux
+env GOOS=linux GOARCH=amd64 go build -o bin/linux/confd .
+tar -C bin/linux/ -czf bin/linux/confd-linux-amd64.tar.gz confd
+
+echo "Release confd darwin version ..."
+mkdir -p bin/darwin
+env GOOS=darwin GOARCH=amd64 go build -o bin/darwin/confd .
+tar -C bin/darwin/ -czf bin/darwin/confd-darwin-amd64.tar.gz confd
+
+ls -lh bin/*
+
+revert_version
