@@ -126,7 +126,7 @@ func (c *Client) WatchPrefix(prefix string, keys []string, waitIndex uint64, sto
 	done := make(chan struct{})
 	defer close(done)
 
-	req, _ := http.NewRequest("GET", fmt.Sprintf("%s%s?wait=true", c.url, prefix), nil)
+	req, _ := http.NewRequest("GET", fmt.Sprintf("%s%s?wait=true&prev_version=%d", c.url, prefix, waitIndex), nil)
 	req.Header.Set("Accept", "application/json")
 
 	go func() {
@@ -140,11 +140,23 @@ func (c *Client) WatchPrefix(prefix string, keys []string, waitIndex uint64, sto
 
 	// just ignore resp, notify confd to reload metadata from metad
 	resp, err := c.httpClient.Do(req)
-	defer resp.Body.Close()
+	if resp != nil {
+		defer resp.Body.Close()
+	}
 	if err != nil {
 		return c.waitIndex, err
 	}
-	c.waitIndex = c.waitIndex + 1
+	versionStr := resp.Header.Get("X-Metad-Version")
+	if versionStr != "" {
+		v, err := strconv.ParseUint(versionStr, 10, 64)
+		if err != nil {
+			log.Error("Parse X-Metad-Version %s error:%s", versionStr, err.Error())
+		}
+		c.waitIndex = v
+	} else {
+		log.Warning("Metad response miss X-Metad-Version header.")
+		c.waitIndex = c.waitIndex + 1
+	}
 	return c.waitIndex, nil
 
 }
