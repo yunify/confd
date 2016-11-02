@@ -41,8 +41,11 @@ before_install:
   - tar -zxvf metad-linux-amd64.tar.gz
   - sudo mv metad /bin/
   # mv repo
+  - echo $PWD
+  - mkdir -p $GOPATH/src/github.com/kelseyhightower/
   - mv $GOPATH/src/github.com/yunify/confd $GOPATH/src/github.com/kelseyhightower/
   - cd $GOPATH/src/github.com/kelseyhightower/confd/
+  - echo $PWD
 install:
   - sudo pip install awscli
   - go get golang.org/x/tools/cmd/cover
