@@ -6,7 +6,7 @@
 
 * keeping local configuration files up-to-date using data stored in [etcd](https://github.com/coreos/etcd),
   [consul](http://consul.io), [dynamodb](http://aws.amazon.com/dynamodb/), [redis](http://redis.io),
-  [vault](https://vaultproject.io), [zookeeper](https://zookeeper.apache.org) or env vars and processing [template resources](docs/template-resources.md).
+  [vault](https://vaultproject.io), [zookeeper](https://zookeeper.apache.org), [metad](https://github.com/yunify/metad) or env vars and processing [template resources](docs/template-resources.md).
 * reloading applications to pick up new config file changes
 
 ## Community
@@ -21,7 +21,7 @@ Go 1.6 is required to build confd, which uses the new vendor directory.
 
 ```
 $ mkdir -p $GOPATH/src/github.com/kelseyhightower
-$ git clone https://github.com/kelseyhightower/confd.git $GOPATH/src/github.com/kelseyhightower/confd
+$ git clone https://github.com/yunify/confd.git $GOPATH/src/github.com/kelseyhightower/confd
 $ cd $GOPATH/src/github.com/kelseyhightower/confd
 $ ./build
 ```
