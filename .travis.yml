@@ -1,7 +1,6 @@
 language: go
 go:
-  - 1.6
-  - tip
+  - 1.7
 env:
   - VAULT_ADDR='http://127.0.0.1:8200'
 services:
