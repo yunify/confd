@@ -476,3 +476,13 @@ func templateResource() (*TemplateResource, error) {
 	tr.FileMode = 0666
 	return tr, nil
 }
+
+func TestLookupIP(t *testing.T) {
+	ips := LookupIP("localhost")
+	if len(ips) == 0 {
+		t.Fatal("lookup ip localhost fail.")
+	}
+	if ips[0] != "127.0.0.1" {
+		t.Errorf("lookup ip localhost get %s", ips)
+	}
+}

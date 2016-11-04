@@ -102,10 +102,13 @@ func LookupIP(data string) []string {
 		return nil
 	}
 	// "Cast" IPs into strings and sort the array
-	ipStrings := make([]string, len(ips))
+	ipStrings := make([]string, 0, len(ips))
 
-	for i, ip := range ips {
-		ipStrings[i] = ip.String()
+	for _, ip := range ips {
+		// exclude ipv6 address
+		if ip.To4() != nil {
+			ipStrings = append(ipStrings, ip.String())
+		}
 	}
 	sort.Strings(ipStrings)
 	return ipStrings
