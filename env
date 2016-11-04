@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-ORG_PATH="github.com/yunify"
+ORG_PATH="github.com/kelseyhightower"
 REPO_PATH="${ORG_PATH}/confd"
 
 function gen_version {
