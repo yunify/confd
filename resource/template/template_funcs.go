@@ -30,6 +30,18 @@ func newFuncMap() map[string]interface{} {
 	m["lookupIP"] = LookupIP
 	m["lookupSRV"] = LookupSRV
 	m["fileExists"] = isFileExist
+	//ext func
+	m["add"] = func(a, b interface{}) (interface{}, error) { return DoArithmetic(a, b, '+') }
+	m["div"] = func(a, b interface{}) (interface{}, error) { return DoArithmetic(a, b, '/') }
+	m["mul"] = func(a, b interface{}) (interface{}, error) { return DoArithmetic(a, b, '*') }
+	m["sub"] = func(a, b interface{}) (interface{}, error) { return DoArithmetic(a, b, '-') }
+	m["eq"] = eq
+	m["ne"] = ne
+	m["gt"] = gt
+	m["ge"] = ge
+	m["lt"] = lt
+	m["le"] = le
+	m["mod"] = mod
 	return m
 }
 
