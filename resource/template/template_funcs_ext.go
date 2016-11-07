@@ -145,13 +145,17 @@ func isFloat(value string) bool {
 func eq(x, y interface{}) bool {
 	normalize := func(v interface{}) interface{} {
 		vv := reflect.ValueOf(v)
+		nv, err := stringToNumber(vv)
+		if err == nil {
+			vv = nv
+		}
 		switch vv.Kind() {
 		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-			return vv.Int()
+			return float64(vv.Int()) //may overflow
 		case reflect.Float32, reflect.Float64:
 			return vv.Float()
 		case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
-			return vv.Uint()
+			return float64(vv.Uint()) //may overflow
 		default:
 			return v
 		}
