@@ -112,6 +112,32 @@ val: 1
 		},
 	},
 	templateTest{
+		desc: "div test2",
+		toml: `
+[template]
+src = "test.conf.tmpl"
+dest = "./tmp/test.conf"
+keys = [
+    "/test/key",
+]
+`,
+		tmpl: `
+{{with get "/test/key"}}
+key: {{base .Key}}
+val: {{div .Value 2}}
+{{end}}
+`,
+		expected: `
+
+key: key
+val: 1.5
+
+`,
+		updateStore: func(tr *TemplateResource) {
+			tr.store.Set("/test/key", "3.00")
+		},
+	},
+	templateTest{
 		desc: "mul test",
 		toml: `
 [template]

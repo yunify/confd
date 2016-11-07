@@ -299,6 +299,27 @@ Wrapper for [net.LookupIP](https://golang.org/pkg/net/#LookupIP) function. The w
 {{end}}
 ```
 
+### Calculate Functions
+
+Calculate functions only support int64 and float64, so may be overflow, string will auto convert to number.
+
+* add +  {{add 3 2}} return 5
+* div /  {{div "3" 2}} return 1, {{div "3.0" 2}} return 1.5
+* mul *  {{mul 3 2}} return 6
+* sub -  {{sub 3 2}} return 1
+* mod %  {{mod 3 2}} return 1
+
+### Compare Functions
+
+Compare functions will auto convert string to number, except eq and ne.
+
+* eq == {{eq "3" 3}} return false  {{eq "3" "3"}} return true
+* ne !=
+* gt >  {{gt "3" 2}} return true
+* ge >=
+* lt <
+* le <=
+
 ## Example Usage
 
 ```Bash
