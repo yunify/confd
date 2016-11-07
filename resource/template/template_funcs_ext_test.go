@@ -242,6 +242,31 @@ val: 1
 			tr.store.Set("/test/key", "3")
 		},
 	},
+	templateTest{
+		desc: "max test",
+		toml: `
+[template]
+src = "test.conf.tmpl"
+dest = "./tmp/test.conf"
+keys = [
+    "/test/key",
+]
+`,
+		tmpl: `
+{{$nodes := gets "/test/key/*"}}
+len: {{len $nodes}}
+max: {{max (len $nodes) 3}}
+`,
+		expected: `
+
+len: 2
+max: 3
+`,
+		updateStore: func(tr *TemplateResource) {
+			tr.store.Set("/test/key/n1", "v1")
+			tr.store.Set("/test/key/n2", "v2")
+		},
+	},
 }
 
 func TestFuncsInTemplate(t *testing.T) {
@@ -374,6 +399,40 @@ func TestMod(t *testing.T) {
 			}
 			if !reflect.DeepEqual(result, this.expect) {
 				t.Errorf("[%d] modulo got %v but expected %v", i, result, this.expect)
+			}
+		}
+	}
+}
+
+func TestMax(t *testing.T) {
+	for i, this := range []struct {
+		a      interface{}
+		b      interface{}
+		expect interface{}
+	}{
+		{3, 2, float64(3)},
+		{"3", 2, float64(3)},
+		{3, "2", float64(3)},
+		{3.1, 3, float64(3.1)},
+		{3, "a", false},
+		{int8(3), int8(2), float64(3)},
+		{int16(3), int16(2), float64(3)},
+		{int32(3), int32(2), float64(3)},
+		{int64(3), int64(2), float64(3)},
+		{float64(3.0001), float64(3.00011), float64(3.00011)},
+	} {
+		result, err := max(this.a, this.b)
+		if b, ok := this.expect.(bool); ok && !b {
+			if err == nil {
+				t.Errorf("[%d] max didn't return an expected error", i)
+			}
+		} else {
+			if err != nil {
+				t.Errorf("[%d] failed: %s", i, err)
+				continue
+			}
+			if !reflect.DeepEqual(result, this.expect) {
+				t.Errorf("[%d] max got %v but expected %v", i, result, this.expect)
 			}
 		}
 	}
