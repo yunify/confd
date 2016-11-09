@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-//The following func is copied from spf13/hugo and do some refactor.
+//Part of the following func is copied from spf13/hugo and do some refactor.
 
 var timeType = reflect.TypeOf((*time.Time)(nil)).Elem()
 
@@ -345,6 +345,51 @@ func max(a, b interface{}) (float64, error) {
 	}
 
 	return math.Max(af, bf), nil
+}
+
+// min returns the smaller of a or b
+func min(a, b interface{}) (float64, error) {
+	av := reflect.ValueOf(a)
+	bv := reflect.ValueOf(b)
+	var err error
+	if av.Kind() == reflect.String {
+		av, err = stringToNumber(av)
+		if err != nil {
+			return 0, err
+		}
+	}
+	if bv.Kind() == reflect.String {
+		bv, err = stringToNumber(bv)
+		if err != nil {
+			return 0, err
+		}
+	}
+
+	var af, bf float64
+
+	switch av.Kind() {
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		af = float64(av.Int()) //may overflow
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+		af = float64(av.Uint()) //may overflow
+	case reflect.Float64, reflect.Float32:
+		af = av.Float()
+	default:
+		return 0, errors.New("Max operator can't apply to the values")
+	}
+
+	switch bv.Kind() {
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		bf = float64(bv.Int()) //may overflow
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+		bf = float64(bv.Uint()) //may overflow
+	case reflect.Float64, reflect.Float32:
+		bf = bv.Float()
+	default:
+		return 0, errors.New("Max operator can't apply to the values")
+	}
+
+	return math.Min(af, bf), nil
 }
 
 func toTimeUnix(v reflect.Value) int64 {

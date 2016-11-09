@@ -309,6 +309,7 @@ Calculate functions only support int64 and float64, so may be overflow, string w
 * sub -  {{sub 3 2}} return 1
 * mod %  {{mod 3 2}} return 1
 * max    {{max 3 2}} return 3, {{max "3" 2}} return 3
+* min    {{min 3 2}} return 2, {{min "3" 2}} return 2
 
 ### Compare Functions
 

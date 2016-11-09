@@ -43,6 +43,7 @@ func newFuncMap() map[string]interface{} {
 	m["le"] = le
 	m["mod"] = mod
 	m["max"] = max
+	m["min"] = min
 	return m
 }
 

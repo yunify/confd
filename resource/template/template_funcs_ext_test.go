@@ -404,7 +404,7 @@ func TestMod(t *testing.T) {
 	}
 }
 
-func TestMax(t *testing.T) {
+func TestMaxAndMin(t *testing.T) {
 	for i, this := range []struct {
 		a      interface{}
 		b      interface{}
@@ -433,6 +433,21 @@ func TestMax(t *testing.T) {
 			}
 			if !reflect.DeepEqual(result, this.expect) {
 				t.Errorf("[%d] max got %v but expected %v", i, result, this.expect)
+			}
+		}
+
+		result, err = min(this.a, this.b)
+		if b, ok := this.expect.(bool); ok && !b {
+			if err == nil {
+				t.Errorf("[%d] min didn't return an expected error", i)
+			}
+		} else {
+			if err != nil {
+				t.Errorf("[%d] failed: %s", i, err)
+				continue
+			}
+			if reflect.DeepEqual(result, this.expect) {
+				t.Errorf("[%d] min not expected %v", i, result)
 			}
 		}
 	}
