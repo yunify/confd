@@ -5,6 +5,7 @@ env:
   - VAULT_ADDR='http://127.0.0.1:8200'
 services:
   - redis
+  - docker
 before_install:
   # install consul
 #  - wget https://releases.hashicorp.com/consul/0.6.3/consul_0.6.3_linux_amd64.zip
