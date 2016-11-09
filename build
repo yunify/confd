@@ -4,8 +4,10 @@ source ./env
 
 gen_version
 
-echo "Building confd..."
+OUTPUT=${1:-bin/confd}
+
+echo "Building confd to $OUTPUT ..."
 mkdir -p bin
-go build -o bin/confd .
+go build -o $OUTPUT .
 
 revert_version

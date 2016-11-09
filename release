@@ -14,6 +14,12 @@ mkdir -p bin/darwin
 env GOOS=darwin GOARCH=amd64 go build -o bin/darwin/confd .
 tar -C bin/darwin/ -czf bin/darwin/confd-darwin-amd64.tar.gz confd
 
+echo "Release confd alpine version ..."
+mkdir -p bin/alpine
+docker build -t confd_builder -f Dockerfile.build.alpine .
+docker run -ti --rm -v $(pwd):/app confd_builder ./build bin/alpine/confd
+tar -C bin/alpine/ -czf bin/alpine/confd-alpine-amd64.tar.gz confd
+
 ls -lh bin/*
 
 revert_version
