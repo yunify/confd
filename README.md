@@ -1,5 +1,7 @@
 # confd
 
+[![Join the chat at https://gitter.im/confd/Lobby](https://badges.gitter.im/confd/Lobby.svg)](https://gitter.im/confd/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 [![Build Status](https://travis-ci.org/yunify/confd.svg?branch=master)](https://travis-ci.org/yunify/confd)
 
 `confd` is a lightweight configuration management tool focused on:
