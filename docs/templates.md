@@ -323,6 +323,18 @@ If convert string to number fail, functions will directly compare origin value.
 * lt <  {{lt "2" 3}} return true
 * le <= {{le "3" 3}} return true
 
+
+### filter
+
+Filter list by regex, if list element should be string, if not, just skip.
+
+```
+{{range lsdir "/deis/services" | filter "prefix.*" }}
+   value: {{.}}
+{{end}}
+```
+
+
 ## Example Usage
 
 ```Bash
