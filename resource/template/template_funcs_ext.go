@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math"
 	"reflect"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -400,4 +401,31 @@ func toTimeUnix(v reflect.Value) int64 {
 		panic("coding error: argument must be time.Time type reflect Value")
 	}
 	return v.MethodByName("Unix").Call([]reflect.Value{})[0].Int()
+}
+
+func Filter(regex string, c interface{}) ([]string, error) {
+	cv := reflect.ValueOf(c)
+
+	switch cv.Kind() {
+	case reflect.Array, reflect.Slice:
+		result := make([]string, 0, cv.Len())
+		for i := 0; i < cv.Len(); i++ {
+			v := cv.Index(i)
+			if v.Kind() == reflect.Interface {
+				v = reflect.ValueOf(v.Interface())
+			}
+			if v.Kind() == reflect.String {
+				matched, err := regexp.MatchString(regex, v.String())
+				if err != nil {
+					return nil, err
+				}
+				if matched {
+					result = append(result, v.String())
+				}
+			}
+		}
+		return result, nil
+	default:
+		return nil, errors.New("filter only support slice or array.")
+	}
 }

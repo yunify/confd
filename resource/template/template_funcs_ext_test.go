@@ -267,6 +267,39 @@ max: 3
 			tr.store.Set("/test/key/n2", "v2")
 		},
 	},
+	templateTest{
+		desc: "filter test",
+		toml: `
+[template]
+src = "test.conf.tmpl"
+dest = "./tmp/test.conf"
+keys = [
+    "/test/data",
+]
+`,
+		tmpl: `
+{{range lsdir "/test/data" | filter "a[123]" }}
+value: {{.}}
+{{end}}
+`,
+		expected: `
+
+value: a1
+
+value: a2
+
+value: a3
+
+`,
+		updateStore: func(tr *TemplateResource) {
+			tr.store.Set("/test/data/a1/v1", "av1")
+			tr.store.Set("/test/data/b1/v1", "bv1")
+			tr.store.Set("/test/data/a2/v2", "av2")
+			tr.store.Set("/test/data/b2/v2", "bv2")
+			tr.store.Set("/test/data/a3/v3", "av3")
+			tr.store.Set("/test/data/b3/v3", "bv3")
+		},
+	},
 }
 
 func TestFuncsInTemplate(t *testing.T) {
@@ -573,6 +606,37 @@ func TestDoArithmetic(t *testing.T) {
 			}
 			if !reflect.DeepEqual(result, this.expect) {
 				t.Errorf("[%d] doArithmetic [%v %s %v ] got %v but expected %v", i, this.a, string(this.op), this.b, result, this.expect)
+			}
+		}
+	}
+}
+
+func TestFilter(t *testing.T) {
+	for i, this := range []struct {
+		input  interface{}
+		regex  string
+		err    bool
+		expect interface{}
+	}{
+		{[]string{"a1", "b1", "a2", "b2", "a3", "b3"}, "a[123]", false, []string{"a1", "a2", "a3"}},
+		{[6]string{"a1", "b1", "a2", "b2", "a3", "b3"}, "a[123]", false, []string{"a1", "a2", "a3"}},
+		{[]interface{}{"a1", 1, "a2", 2, "a3", 3}, "a[123]", false, []string{"a1", "a2", "a3"}},
+		{[6]interface{}{"a1", 1, "a2", 2, "a3", 3}, "a[123]", false, []string{"a1", "a2", "a3"}},
+		{[]interface{}{"a1"}, "a.**", true, nil},
+		{"a1", "a.**", true, nil},
+	} {
+		result, err := Filter(this.regex, this.input)
+		if this.err {
+			if err == nil {
+				t.Errorf("[%d] Filter didn't return an expected error", i)
+			}
+		} else {
+			if err != nil {
+				t.Errorf("[%d] failed: %s", i, err)
+				continue
+			}
+			if !reflect.DeepEqual(result, this.expect) {
+				t.Errorf("[%d] Filter [%v] got %v but expected %v", i, this.input, result, this.expect)
 			}
 		}
 	}
