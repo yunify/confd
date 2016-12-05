@@ -1,49 +1,125 @@
 package metad
 
 import (
+	"container/ring"
 	"encoding/json"
+	"errors"
+	"fmt"
+	"github.com/kelseyhightower/confd/log"
 	"io/ioutil"
+	"math/rand"
 	"net/http"
 	"reflect"
 	"strconv"
 	"strings"
+	"sync"
+	"sync/atomic"
 	"time"
-
-	"fmt"
-	"github.com/kelseyhightower/confd/log"
 )
 
-type Client struct {
+type Connection struct {
 	url        string
 	transport  *http.Transport
 	httpClient *http.Client
 	waitIndex  uint64
+	errTimes   uint32
 }
 
-func NewMetadClient(backendNode string) (*Client, error) {
-	url := "http://" + backendNode
+func (c *Connection) testConnection() error {
+	var err error
+	maxTime := 15 * time.Second
 
-	log.Info("Using Metad URL: " + url)
-	transport := &http.Transport{}
-	client := &Client{
-		url: url,
-		httpClient: &http.Client{
-			Transport: transport,
-		},
-		transport: transport,
+	for i := 1 * time.Second; i < maxTime; i *= time.Duration(2) {
+		if _, err = c.makeMetaDataRequest("/"); err != nil {
+			time.Sleep(i)
+		} else {
+			return nil
+		}
+	}
+	return err
+}
+
+func (c *Connection) makeMetaDataRequest(path string) ([]byte, error) {
+	req, _ := http.NewRequest("GET", strings.Join([]string{c.url, path}, ""), nil)
+	req.Header.Set("Accept", "application/json")
+
+	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	return ioutil.ReadAll(resp.Body)
+}
+
+type Client struct {
+	connections *ring.Ring
+	current     *Connection
+	lock        *sync.RWMutex
+}
+
+func NewMetadClient(backendNodes []string) (*Client, error) {
+	connections := ring.New(len(backendNodes))
+	for _, backendNode := range backendNodes {
+		url := "http://" + backendNode
+		transport := &http.Transport{}
+		connection := &Connection{
+			url: url,
+			httpClient: &http.Client{
+				Transport: transport,
+			},
+			transport: transport,
+		}
+		connections.Value = connection
+		connections = connections.Next()
 	}
 
-	err := client.testConnection()
+	client := &Client{
+		connections: connections,
+		lock:        &sync.RWMutex{},
+	}
+
+	err := client.selectConnection()
+
 	return client, err
 
+}
+
+func (c *Client) selectConnection() error {
+	//random start
+	if c.current == nil {
+		rand.Seed(time.Now().Unix())
+		r := rand.Intn(c.connections.Len())
+		c.connections = c.connections.Move(r)
+	}
+	c.connections = c.connections.Next()
+	conn := c.connections.Value.(*Connection)
+	startConn := conn
+	err := conn.testConnection()
+	for err != nil {
+		log.Error("Connection to [%s], error: [%s]", conn.url, err.Error())
+		c.connections = c.connections.Next()
+		conn = c.connections.Value.(*Connection)
+		if conn == startConn {
+			return errors.New("Fail to connect any backend.")
+		}
+		err = conn.testConnection()
+	}
+	if c.current != nil {
+		atomic.StoreUint32(&c.current.errTimes, 0)
+	}
+	c.current = conn
+	log.Info("Using Metad URL: " + c.current.url)
+	return nil
 }
 
 func (c *Client) GetValues(keys []string) (map[string]string, error) {
 	vars := map[string]string{}
 
 	for _, key := range keys {
-		body, err := c.makeMetaDataRequest(key)
+		body, err := c.current.makeMetaDataRequest(key)
 		if err != nil {
+			atomic.AddUint32(&c.current.errTimes, 1)
 			return vars, err
 		}
 
@@ -90,61 +166,47 @@ func treeWalk(root string, val interface{}, vars map[string]string) error {
 	return nil
 }
 
-func (c *Client) makeMetaDataRequest(path string) ([]byte, error) {
-	req, _ := http.NewRequest("GET", strings.Join([]string{c.url, path}, ""), nil)
-	req.Header.Set("Accept", "application/json")
-
-	resp, err := c.httpClient.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	return ioutil.ReadAll(resp.Body)
-}
-
-func (c *Client) testConnection() error {
-	var err error
-	maxTime := 20 * time.Second
-
-	for i := 1 * time.Second; i < maxTime; i *= time.Duration(2) {
-		if _, err = c.makeMetaDataRequest("/"); err != nil {
-			time.Sleep(i)
-		} else {
-			return nil
-		}
-	}
-	return err
-}
-
 func (c *Client) WatchPrefix(prefix string, keys []string, waitIndex uint64, stopChan chan bool) (uint64, error) {
+
+	if c.current.errTimes >= 3 {
+		c.selectConnection()
+	}
+
+	conn := c.current
+
 	// return something > 0 to trigger a key retrieval from the store
 	if waitIndex == 0 {
-		c.waitIndex = 1
-		return c.waitIndex, nil
+		conn.waitIndex = 1
+		return conn.waitIndex, nil
 	}
+	// when switch to anther server, so set waitIndex 0, and let server response current version.
+	if conn.waitIndex == 0 {
+		waitIndex = 0
+	}
+
 	done := make(chan struct{})
 	defer close(done)
 
-	req, _ := http.NewRequest("GET", fmt.Sprintf("%s%s?wait=true&prev_version=%d", c.url, prefix, waitIndex), nil)
+	req, _ := http.NewRequest("GET", fmt.Sprintf("%s%s?wait=true&prev_version=%d", conn.url, prefix, waitIndex), nil)
 	req.Header.Set("Accept", "application/json")
 
 	go func() {
 		select {
 		case <-stopChan:
-			c.transport.CancelRequest(req)
+			conn.transport.CancelRequest(req)
 		case <-done:
 			return
 		}
 	}()
 
 	// just ignore resp, notify confd to reload metadata from metad
-	resp, err := c.httpClient.Do(req)
+	resp, err := conn.httpClient.Do(req)
 	if resp != nil {
 		defer resp.Body.Close()
 	}
 	if err != nil {
-		return c.waitIndex, err
+		atomic.AddUint32(&conn.errTimes, 1)
+		return conn.waitIndex, err
 	}
 	versionStr := resp.Header.Get("X-Metad-Version")
 	if versionStr != "" {
@@ -152,11 +214,11 @@ func (c *Client) WatchPrefix(prefix string, keys []string, waitIndex uint64, sto
 		if err != nil {
 			log.Error("Parse X-Metad-Version %s error:%s", versionStr, err.Error())
 		}
-		c.waitIndex = v
+		conn.waitIndex = v
 	} else {
 		log.Warning("Metad response miss X-Metad-Version header.")
-		c.waitIndex = c.waitIndex + 1
+		conn.waitIndex = conn.waitIndex + 1
 	}
-	return c.waitIndex, nil
+	return conn.waitIndex, nil
 
 }

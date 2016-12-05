@@ -67,7 +67,7 @@ func New(config Config) (StoreClient, error) {
 	case "stackengine":
 		return stackengine.NewStackEngineClient(backendNodes, config.Scheme, config.ClientCert, config.ClientKey, config.ClientCaKeys, config.AuthToken)
 	case "metad":
-		return metad.NewMetadClient(backendNodes[0])
+		return metad.NewMetadClient(backendNodes)
 	}
 	return nil, errors.New("Invalid backend")
 }
