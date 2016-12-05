@@ -12,7 +12,6 @@ import (
 	"reflect"
 	"strconv"
 	"strings"
-	"sync"
 	"sync/atomic"
 	"time"
 )
@@ -55,7 +54,6 @@ func (c *Connection) makeMetaDataRequest(path string) ([]byte, error) {
 type Client struct {
 	connections *ring.Ring
 	current     *Connection
-	lock        *sync.RWMutex
 }
 
 func NewMetadClient(backendNodes []string) (*Client, error) {
@@ -76,7 +74,6 @@ func NewMetadClient(backendNodes []string) (*Client, error) {
 
 	client := &Client{
 		connections: connections,
-		lock:        &sync.RWMutex{},
 	}
 
 	err := client.selectConnection()
