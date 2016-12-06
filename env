@@ -4,7 +4,7 @@ ORG_PATH="github.com/kelseyhightower"
 REPO_PATH="${ORG_PATH}/confd"
 
 function gen_version {
-VERSION=${TRAVIS_TAG:-0.12.0-dev}
+VERSION=${TRAVIS_TAG:-0.13-dev}
 GIT_VERSION=$(git rev-parse --verify -q HEAD)
 cat <<EOT > version.go
 package main
