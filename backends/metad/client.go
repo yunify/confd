@@ -205,6 +205,9 @@ func (c *Client) WatchPrefix(prefix string, keys []string, waitIndex uint64, sto
 		atomic.AddUint32(&conn.errTimes, 1)
 		return conn.waitIndex, err
 	}
+	if resp.StatusCode != 200 {
+		return conn.waitIndex, errors.New(fmt.Sprintf("metad response status [%v], requestID: [%s]", resp.StatusCode, resp.Header.Get("X-Metad-RequestID")))
+	}
 	versionStr := resp.Header.Get("X-Metad-Version")
 	if versionStr != "" {
 		v, err := strconv.ParseUint(versionStr, 10, 64)
