@@ -73,6 +73,7 @@ deploy:
         - "bin/linux/confd-linux-amd64.tar.gz"
         - "bin/darwin/confd-darwin-amd64.tar.gz"
         - "bin/alpine/confd-alpine-amd64.tar.gz"
+        - "bin/windows/confd-windows-386.tar.gz"
     on:
         repo: yunify/confd
         tags: true
