@@ -17,7 +17,7 @@ tar -C bin/darwin/ -czf bin/darwin/confd-darwin-amd64.tar.gz confd
 echo "Release confd windows version ..."
 mkdir -p bin/windows
 env GOOS=windows GOARCH=386 go build -o bin/windows/confd.exe .
-tar -C bin/windows/ -czf bin/windows/confd-windows-386.tar.gz confd.exe
+cd bin/windows && zip confd-windows-386.zip confd.exe && cd ../../
 
 echo "Release confd alpine version ..."
 mkdir -p bin/alpine
