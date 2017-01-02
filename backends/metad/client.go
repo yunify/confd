@@ -39,7 +39,10 @@ func (c *Connection) testConnection() error {
 }
 
 func (c *Connection) makeMetaDataRequest(path string) ([]byte, error) {
-	req, _ := http.NewRequest("GET", strings.Join([]string{c.url, path}, ""), nil)
+	req, err := http.NewRequest("GET", strings.Join([]string{c.url, path}, ""), nil)
+	if err != nil {
+		return nil, err
+	}
 	req.Header.Set("Accept", "application/json")
 
 	resp, err := c.httpClient.Do(req)
