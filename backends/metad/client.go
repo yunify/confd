@@ -187,7 +187,10 @@ func (c *Client) WatchPrefix(prefix string, keys []string, waitIndex uint64, sto
 	done := make(chan struct{})
 	defer close(done)
 
-	req, _ := http.NewRequest("GET", fmt.Sprintf("%s%s?wait=true&prev_version=%d", conn.url, prefix, waitIndex), nil)
+	req, err := http.NewRequest("GET", fmt.Sprintf("%s%s?wait=true&prev_version=%d", conn.url, prefix, waitIndex), nil)
+	if err != nil {
+		return conn.waitIndex, err
+	}
 	req.Header.Set("Accept", "application/json")
 
 	go func() {
