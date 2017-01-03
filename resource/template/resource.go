@@ -136,7 +136,7 @@ func (t *TemplateResource) createStageFile() error {
 	}
 
 	log.Debug("Compiling source template " + t.Src)
-	tmpl, err := template.New(path.Base(t.Src)).Funcs(t.funcMap).ParseFiles(t.Src)
+	tmpl, err := template.New(filepath.Base(t.Src)).Funcs(t.funcMap).ParseFiles(t.Src)
 	if err != nil {
 		return fmt.Errorf("Unable to process template %s, %s", t.Src, err)
 	}
