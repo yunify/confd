@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"os/exec"
 	"path"
 	"path/filepath"
 	"strconv"
@@ -243,7 +242,7 @@ func (t *TemplateResource) check() error {
 		return err
 	}
 	log.Debug("Running " + cmdBuffer.String())
-	c := exec.Command("/bin/sh", "-c", cmdBuffer.String())
+	c := command(cmdBuffer.String())
 	output, err := c.CombinedOutput()
 	if err != nil {
 		log.Error(fmt.Sprintf("%q", string(output)))
@@ -257,7 +256,7 @@ func (t *TemplateResource) check() error {
 // It returns nil if the reload command returns 0.
 func (t *TemplateResource) reload() error {
 	log.Debug("Running " + t.ReloadCmd)
-	c := exec.Command("/bin/sh", "-c", t.ReloadCmd)
+	c := command(t.ReloadCmd)
 	output, err := c.CombinedOutput()
 	if err != nil {
 		log.Error(fmt.Sprintf("%q", string(output)))

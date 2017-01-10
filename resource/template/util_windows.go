@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"os/exec"
 )
 
 // fileStat return a fileInfo describing the named file.
@@ -28,4 +29,8 @@ func fileStat(name string) (fi fileInfo, err error) {
 	} else {
 		return fi, errors.New("File not found")
 	}
+}
+
+func command(cmd string) *exec.Cmd {
+	return exec.Command("cmd", "/C", cmd)
 }
