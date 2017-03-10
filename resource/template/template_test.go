@@ -395,6 +395,69 @@ ip: 127.0.0.1
 			tr.store.Set("/test/data/def", "child")
 		},
 	},
+	templateTest{
+		desc: "filter test",
+		toml: `
+[template]
+src = "test.conf.tmpl"
+dest = "./tmp/test.conf"
+keys = [
+    "/test/data/abc/dsf",
+    "/test/data/adef/ghi",
+    "/test/data/jkl/mno",
+]
+`,
+		tmpl: `
+{{range lsdir "/test/data" | filter "a.*" }}
+value: {{.}}
+{{end}}
+`,
+		expected: `
+
+value: abc
+
+value: adef
+
+`,
+		updateStore: func(tr *TemplateResource) {
+			tr.store.Set("/test/data/abc/asf", "123")
+			tr.store.Set("/test/data/adef/ghi", "456")
+			tr.store.Set("/test/data/jkl/mno", "789")
+		},
+	},
+	templateTest{
+		desc: "filter kv test",
+		toml: `
+[template]
+src = "test.conf.tmpl"
+dest = "./tmp/test.conf"
+keys = [
+    "/test/data/a1/id",
+    "/test/data/a2/id",
+    "/test/data/b1/id",
+]
+`,
+		tmpl: `
+{{range gets "/test/data/*/id" | filter "a.*"}}
+key: {{.Key}}
+value: {{.Value}}
+{{end}}
+`,
+		expected: `
+
+key: /test/data/a1/id
+value: a1
+
+key: /test/data/a2/id
+value: a2
+
+`,
+		updateStore: func(tr *TemplateResource) {
+			tr.store.Set("/test/data/a1/id", "a1")
+			tr.store.Set("/test/data/a2/id", "a2")
+			tr.store.Set("/test/data/b1/id", "b1")
+		},
+	},
 }
 
 // TestTemplates runs all tests in templateTests

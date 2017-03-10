@@ -3,6 +3,7 @@ package template
 import (
 	"errors"
 	"fmt"
+	"github.com/kelseyhightower/memkv"
 	"math"
 	"reflect"
 	"regexp"
@@ -403,12 +404,14 @@ func toTimeUnix(v reflect.Value) int64 {
 	return v.MethodByName("Unix").Call([]reflect.Value{})[0].Int()
 }
 
-func Filter(regex string, c interface{}) ([]string, error) {
+var kvType = reflect.TypeOf(memkv.KVPair{}).Kind()
+
+func Filter(regex string, c interface{}) ([]interface{}, error) {
 	cv := reflect.ValueOf(c)
 
 	switch cv.Kind() {
 	case reflect.Array, reflect.Slice:
-		result := make([]string, 0, cv.Len())
+		result := make([]interface{}, 0, cv.Len())
 		for i := 0; i < cv.Len(); i++ {
 			v := cv.Index(i)
 			if v.Kind() == reflect.Interface {
@@ -421,6 +424,15 @@ func Filter(regex string, c interface{}) ([]string, error) {
 				}
 				if matched {
 					result = append(result, v.String())
+				}
+			} else if v.Kind() == kvType {
+				kv := v.Interface().(memkv.KVPair)
+				matched, err := regexp.MatchString(regex, kv.Value)
+				if err != nil {
+					return nil, err
+				}
+				if matched {
+					result = append(result, kv)
 				}
 			}
 		}

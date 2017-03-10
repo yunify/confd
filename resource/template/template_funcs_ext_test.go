@@ -1,6 +1,7 @@
 package template
 
 import (
+	"github.com/kelseyhightower/memkv"
 	"path"
 	"reflect"
 	"runtime"
@@ -618,12 +619,24 @@ func TestFilter(t *testing.T) {
 		err    bool
 		expect interface{}
 	}{
-		{[]string{"a1", "b1", "a2", "b2", "a3", "b3"}, "a[123]", false, []string{"a1", "a2", "a3"}},
-		{[6]string{"a1", "b1", "a2", "b2", "a3", "b3"}, "a[123]", false, []string{"a1", "a2", "a3"}},
-		{[]interface{}{"a1", 1, "a2", 2, "a3", 3}, "a[123]", false, []string{"a1", "a2", "a3"}},
-		{[6]interface{}{"a1", 1, "a2", 2, "a3", 3}, "a[123]", false, []string{"a1", "a2", "a3"}},
+		{[]string{"a1", "b1", "a2", "b2", "a3", "b3"}, "a[123]", false, []interface{}{"a1", "a2", "a3"}},
+		{[6]string{"a1", "b1", "a2", "b2", "a3", "b3"}, "a[123]", false, []interface{}{"a1", "a2", "a3"}},
+		{[]interface{}{"a1", 1, "a2", 2, "a3", 3}, "a[123]", false, []interface{}{"a1", "a2", "a3"}},
+		{[6]interface{}{"a1", 1, "a2", 2, "a3", 3}, "a[123]", false, []interface{}{"a1", "a2", "a3"}},
 		{[]interface{}{"a1"}, "a.**", true, nil},
 		{"a1", "a.**", true, nil},
+		{[]interface{}{
+			memkv.KVPair{Key: "k1", Value: "a1"},
+			memkv.KVPair{Key: "k2", Value: "a2"},
+			memkv.KVPair{Key: "k3", Value: "a3"},
+			memkv.KVPair{Key: "k4", Value: "b1"},
+		},
+
+			"a[123]", false, []interface{}{
+				memkv.KVPair{Key: "k1", Value: "a1"},
+				memkv.KVPair{Key: "k2", Value: "a2"},
+				memkv.KVPair{Key: "k3", Value: "a3"},
+			}},
 	} {
 		result, err := Filter(this.regex, this.input)
 		if this.err {
