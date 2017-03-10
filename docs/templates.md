@@ -326,7 +326,7 @@ If convert string to number fail, functions will directly compare origin value.
 
 ### filter
 
-Filter list by regex, if list element should be string, if not, just skip.
+Filter string list by regex (if element is not string, just skip).
 
 ```
 {{range lsdir "/deis/services" | filter "prefix.*" }}
@@ -334,6 +334,14 @@ Filter list by regex, if list element should be string, if not, just skip.
 {{end}}
 ```
 
+Filter KVPair list by regex, regex work on KVPair's value.
+
+```
+{{range gets "/deis/services/*" | filter "prefix.*" }}
+   key: {{.Key}}
+   value: {{.Value}}
+{{end}}
+```
 
 ## Example Usage
 
