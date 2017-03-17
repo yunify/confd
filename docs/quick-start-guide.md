@@ -252,7 +252,10 @@ curl -X PUT -d '10.0.1.103:80' http://localhost:8500/v1/kv/yourapp/upstream/app2
 prefix = "/myapp"
 src = "nginx.tmpl"
 dest = "/tmp/myapp.conf"
-owner = "nginx"
+# the uid of nginx
+uid = 1000
+# the gid of nginx
+gid = 1000
 mode = "0644"
 keys = [
   "/subdomain",
@@ -269,7 +272,8 @@ reload_cmd = "/usr/sbin/service nginx reload"
 prefix = "/yourapp"
 src = "nginx.tmpl"
 dest = "/tmp/yourapp.conf"
-owner = "nginx"
+uid = 1000
+gid = 1000
 mode = "0644"
 keys = [
   "/subdomain",
