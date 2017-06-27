@@ -317,8 +317,8 @@ Compare functions will try convert string to number，then compare number. All n
 If convert string to number fail, functions will directly compare origin value.
 
 * eq == {{eq "3" 3}} return true, {{eq 3 3.0}} return true, {{eq "3" "3"}} return true, {{eq 3 "a"}} return false
-* ne != {{eq "3" 3}} return true,  {{eq "3" "3"}} return false
-* gt >  {{gt "3" 2}} return true,  {{gt "3" 2.0 }} return true, {{gt "b" "a"}} return true,
+* ne != {{ne "3" 3}} return false,  {{ne "3" "3"}} return false,  {{ne 3 "a"}} return true
+* gt >  {{gt "3" 2}} return true,  {{gt "3" 2.0 }} return true, {{gt "b" "a"}} return true
 * ge >= {{ge "3" 3}} return true
 * lt <  {{lt "2" 3}} return true
 * le <= {{le "3" 3}} return true
