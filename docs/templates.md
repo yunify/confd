@@ -343,6 +343,24 @@ Filter KVPair list by regex, regex work on KVPair's value.
 {{end}}
 ```
 
+### toJson
+
+Marshal object to json string
+
+```
+{{$hosts := getvs "/test/data/*/id"}}
+{{toJson $hosts}}
+```
+
+### toYaml
+
+Marshal object to yaml string
+
+```
+hosts:{{$hosts := getvs "/test/data/*/id"}}
+{{toYaml $hosts}}
+```
+
 ## Example Usage
 
 ```Bash

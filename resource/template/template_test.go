@@ -458,6 +458,70 @@ value: a2
 			tr.store.Set("/test/data/b1/id", "b1")
 		},
 	},
+	templateTest{
+		desc: "toJson test",
+		toml: `
+[template]
+src = "test.conf.tmpl"
+dest = "./tmp/test.conf"
+keys = [
+    "/test/data/a1/id",
+    "/test/data/a2/id",
+    "/test/data/ids",
+]
+`,
+		tmpl: `
+{{$hosts := getvs "/test/data/*/id"}}
+{{toJson $hosts}}
+{{$idsv := getv "/test/data/ids"}}{{$ids := split $idsv " "}}
+{{toJson $ids}}
+`,
+		expected: `
+
+["a1","a2"]
+
+["b1","b2"]
+`,
+		updateStore: func(tr *TemplateResource) {
+			tr.store.Set("/test/data/a1/id", "a1")
+			tr.store.Set("/test/data/a2/id", "a2")
+			tr.store.Set("/test/data/ids", "b1 b2")
+		},
+	},
+	templateTest{
+		desc: "toYaml test",
+		toml: `
+[template]
+src = "test.conf.tmpl"
+dest = "./tmp/test.conf"
+keys = [
+    "/test/data/a1/id",
+    "/test/data/a2/id",
+    "/test/data/ids",
+]
+`,
+		tmpl: `
+hosts:{{$hosts := getvs "/test/data/*/id"}}
+{{toYaml $hosts}}
+ids:{{$idsv := getv "/test/data/ids"}}{{$ids := split $idsv " "}}
+{{toYaml $ids}}
+`,
+		expected: `
+hosts:
+- a1
+- a2
+
+ids:
+- b1
+- b2
+
+`,
+		updateStore: func(tr *TemplateResource) {
+			tr.store.Set("/test/data/a1/id", "a1")
+			tr.store.Set("/test/data/a2/id", "a2")
+			tr.store.Set("/test/data/ids", "b1 b2")
+		},
+	},
 }
 
 // TestTemplates runs all tests in templateTests

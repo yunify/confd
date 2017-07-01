@@ -1,9 +1,11 @@
 package template
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/kelseyhightower/memkv"
+	yaml "gopkg.in/yaml.v2"
 	"math"
 	"reflect"
 	"regexp"
@@ -440,4 +442,20 @@ func Filter(regex string, c interface{}) ([]interface{}, error) {
 	default:
 		return nil, errors.New("filter only support slice or array.")
 	}
+}
+
+func ToJson(v interface{}) (string, error) {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return "", err
+	}
+	return string(b), nil
+}
+
+func ToYaml(v interface{}) (string, error) {
+	b, err := yaml.Marshal(v)
+	if err != nil {
+		return "", err
+	}
+	return string(b), nil
 }

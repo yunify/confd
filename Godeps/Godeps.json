@@ -199,6 +199,10 @@
 		{
 			"ImportPath": "golang.org/x/sys/unix",
 			"Rev": "20457ee8ea8546920d3f4e19e405da45250dc5a5"
+		},
+		{
+			"ImportPath": "gopkg.in/yaml.v2",
+			"Rev": "cd8b52f8269e0feb286dfeef29f8fe4d5b397e0b"
 		}
 	]
 }
