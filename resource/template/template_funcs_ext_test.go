@@ -654,3 +654,53 @@ func TestFilter(t *testing.T) {
 		}
 	}
 }
+
+func TestToJsonAndYaml(t *testing.T) {
+	for i, this := range []struct {
+		input      interface{}
+		err        bool
+		expectJson string
+		expectYaml string
+	}{
+		{[]string{"a1", "b1"}, false, `["a1","b1"]`, "- a1\n- b1\n"},
+		{"a1", false, `"a1"`, "a1\n"},
+		{1, false, "1", "1\n"},
+		{struct {Name string}{Name:"test"}, false, `{"Name":"test"}`, "name: test\n"},
+		{struct {Name string; Addr []string}{Name:"test", Addr: []string{"a1", "a2"}}, false, `{"Name":"test","Addr":["a1","a2"]}`,
+			`name: test
+addr:
+- a1
+- a2
+`},
+	} {
+		result, err := ToJson(this.input)
+		if this.err {
+			if err == nil {
+				t.Errorf("[%d] ToJson didn't return an expected error", i)
+			}
+		} else {
+			if err != nil {
+				t.Errorf("[%d] failed: %s", i, err)
+				continue
+			}
+			if !reflect.DeepEqual(result, this.expectJson) {
+				t.Errorf("[%d] ToJson [%v] got %v but expected %v", i, this.input, result, this.expectJson)
+			}
+		}
+
+		result, err = ToYaml(this.input)
+		if this.err {
+			if err == nil {
+				t.Errorf("[%d] ToYaml didn't return an expected error", i)
+			}
+		} else {
+			if err != nil {
+				t.Errorf("[%d] failed: %s", i, err)
+				continue
+			}
+			if result != this.expectYaml {
+				t.Errorf("[%d] ToYaml [%v] got %v but expected %v", i, this.input, result, this.expectYaml)
+			}
+		}
+	}
+}

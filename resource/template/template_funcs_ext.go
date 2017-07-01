@@ -10,6 +10,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"encoding/json"
+	"gopkg.in/v1/yaml"
 )
 
 //Part of the following func is copied from spf13/hugo and do some refactor.
@@ -440,4 +442,20 @@ func Filter(regex string, c interface{}) ([]interface{}, error) {
 	default:
 		return nil, errors.New("filter only support slice or array.")
 	}
+}
+
+func ToJson(v interface{}) (string, error){
+	b, err := json.Marshal(v)
+	if err != nil {
+		return "", err
+	}
+	return string(b), nil
+}
+
+func ToYaml(v interface{}) (string, error){
+	b, err := yaml.Marshal(v)
+	if err != nil {
+		return "", err
+	}
+	return string(b), nil
 }

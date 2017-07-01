@@ -45,6 +45,8 @@ func newFuncMap() map[string]interface{} {
 	m["max"] = max
 	m["min"] = min
 	m["filter"] = Filter
+	m["toJson"] = ToJson
+	m["toYaml"] = ToYaml
 	return m
 }
 
