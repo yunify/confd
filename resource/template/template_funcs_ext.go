@@ -1,17 +1,17 @@
 package template
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/kelseyhightower/memkv"
+	yaml "gopkg.in/yaml.v2"
 	"math"
 	"reflect"
 	"regexp"
 	"strconv"
 	"strings"
 	"time"
-	"encoding/json"
-	"gopkg.in/v1/yaml"
 )
 
 //Part of the following func is copied from spf13/hugo and do some refactor.
@@ -444,7 +444,7 @@ func Filter(regex string, c interface{}) ([]interface{}, error) {
 	}
 }
 
-func ToJson(v interface{}) (string, error){
+func ToJson(v interface{}) (string, error) {
 	b, err := json.Marshal(v)
 	if err != nil {
 		return "", err
@@ -452,7 +452,7 @@ func ToJson(v interface{}) (string, error){
 	return string(b), nil
 }
 
-func ToYaml(v interface{}) (string, error){
+func ToYaml(v interface{}) (string, error) {
 	b, err := yaml.Marshal(v)
 	if err != nil {
 		return "", err
