@@ -8,8 +8,8 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"syscall"
 	"os/exec"
+	"syscall"
 )
 
 // fileStat return a fileInfo describing the named file.
