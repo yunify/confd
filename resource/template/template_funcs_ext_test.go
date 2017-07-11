@@ -665,8 +665,11 @@ func TestToJsonAndYaml(t *testing.T) {
 		{[]string{"a1", "b1"}, false, `["a1","b1"]`, "- a1\n- b1\n"},
 		{"a1", false, `"a1"`, "a1\n"},
 		{1, false, "1", "1\n"},
-		{struct {Name string}{Name:"test"}, false, `{"Name":"test"}`, "name: test\n"},
-		{struct {Name string; Addr []string}{Name:"test", Addr: []string{"a1", "a2"}}, false, `{"Name":"test","Addr":["a1","a2"]}`,
+		{struct{ Name string }{Name: "test"}, false, `{"Name":"test"}`, "name: test\n"},
+		{struct {
+			Name string
+			Addr []string
+		}{Name: "test", Addr: []string{"a1", "a2"}}, false, `{"Name":"test","Addr":["a1","a2"]}`,
 			`name: test
 addr:
 - a1
@@ -700,6 +703,35 @@ addr:
 			}
 			if result != this.expectYaml {
 				t.Errorf("[%d] ToYaml [%v] got %v but expected %v", i, this.input, result, this.expectYaml)
+			}
+		}
+	}
+}
+
+func TestBase64(t *testing.T) {
+	for i, this := range []struct {
+		input  interface{}
+		err    bool
+		expect string
+	}{
+		{"", false, ""},
+		{"aaa", false, "YWFh"},
+		{[]byte("aaa"), false, "YWFh"},
+		{"user:123Abc", false, "dXNlcjoxMjNBYmM="},
+		{struct{}{}, true, ""},
+	} {
+		result, err := Base64(this.input)
+		if this.err {
+			if err == nil {
+				t.Errorf("[%d] Base64 didn't return an expected error", i)
+			}
+		} else {
+			if err != nil {
+				t.Errorf("[%d] failed: %s", i, err)
+				continue
+			}
+			if !reflect.DeepEqual(result, this.expect) {
+				t.Errorf("[%d] Base64 [%v] got %v but expected %v", i, this.input, result, this.expect)
 			}
 		}
 	}

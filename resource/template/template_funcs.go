@@ -47,6 +47,7 @@ func newFuncMap() map[string]interface{} {
 	m["filter"] = Filter
 	m["toJson"] = ToJson
 	m["toYaml"] = ToYaml
+	m["base64"] = Base64
 	return m
 }
 

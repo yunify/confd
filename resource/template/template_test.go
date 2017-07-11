@@ -522,6 +522,30 @@ ids:
 			tr.store.Set("/test/data/ids", "b1 b2")
 		},
 	},
+	templateTest{
+		desc: "base64 test",
+		toml: `
+[template]
+src = "test.conf.tmpl"
+dest = "./tmp/test.conf"
+keys = [
+    "/test/data/username",
+    "/test/data/password",
+]
+`,
+		tmpl: `
+{{$username := getv "/test/data/username"}}{{$password := getv "/test/data/password"}}{{$pair := printf "%s:%s" $username $password}}
+base64:{{base64 $pair}}
+`,
+		expected: `
+
+base64:dXNlcjoxMjNBYmM=
+`,
+		updateStore: func(tr *TemplateResource) {
+			tr.store.Set("/test/data/username", "user")
+			tr.store.Set("/test/data/password", "123Abc")
+		},
+	},
 }
 
 // TestTemplates runs all tests in templateTests
