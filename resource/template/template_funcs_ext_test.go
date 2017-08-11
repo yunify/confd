@@ -708,7 +708,7 @@ addr:
 	}
 }
 
-func TestBase64(t *testing.T) {
+func TestBase64Encode(t *testing.T) {
 	for i, this := range []struct {
 		input  interface{}
 		err    bool
@@ -718,12 +718,13 @@ func TestBase64(t *testing.T) {
 		{"aaa", false, "YWFh"},
 		{[]byte("aaa"), false, "YWFh"},
 		{"user:123Abc", false, "dXNlcjoxMjNBYmM="},
+		{"user:\n123Abc", false, "dXNlcjoKMTIzQWJj"},
 		{struct{}{}, true, ""},
 	} {
-		result, err := Base64(this.input)
+		result, err := Base64Encode(this.input)
 		if this.err {
 			if err == nil {
-				t.Errorf("[%d] Base64 didn't return an expected error", i)
+				t.Errorf("[%d] Base64Encode didn't return an expected error", i)
 			}
 		} else {
 			if err != nil {
@@ -731,7 +732,37 @@ func TestBase64(t *testing.T) {
 				continue
 			}
 			if !reflect.DeepEqual(result, this.expect) {
-				t.Errorf("[%d] Base64 [%v] got %v but expected %v", i, this.input, result, this.expect)
+				t.Errorf("[%d] Base64Encode [%v] got %v but expected %v", i, this.input, result, this.expect)
+			}
+		}
+	}
+}
+
+
+func TestBase64Decode(t *testing.T) {
+	for i, this := range []struct {
+		input  interface{}
+		err    bool
+		expect string
+	}{
+		{"", false, ""},
+		{"YWFh", false, "aaa"},
+		{"dXNlcjoxMjNBYmM=", false, "user:123Abc"},
+		{"dXNlcjoKMTIzQWJj", false, "user:\n123Abc"},
+		{struct{}{}, true, ""},
+	} {
+		result, err := Base64Decode(this.input)
+		if this.err {
+			if err == nil {
+				t.Errorf("[%d] Base64Decode didn't return an expected error", i)
+			}
+		} else {
+			if err != nil {
+				t.Errorf("[%d] failed: %s", i, err)
+				continue
+			}
+			if !reflect.DeepEqual(result, this.expect) {
+				t.Errorf("[%d] Base64Decode [%v] got %v but expected %v", i, this.input, result, this.expect)
 			}
 		}
 	}
