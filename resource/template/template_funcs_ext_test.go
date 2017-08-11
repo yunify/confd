@@ -738,7 +738,6 @@ func TestBase64Encode(t *testing.T) {
 	}
 }
 
-
 func TestBase64Decode(t *testing.T) {
 	for i, this := range []struct {
 		input  interface{}
