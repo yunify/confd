@@ -1,12 +1,13 @@
 package template
 
 import (
-	"github.com/kelseyhightower/memkv"
 	"path"
 	"reflect"
 	"runtime"
 	"testing"
 	"time"
+
+	"github.com/kelseyhightower/memkv"
 )
 
 type tstCompareType int
@@ -58,6 +59,32 @@ val: 2
 `,
 		updateStore: func(tr *TemplateResource) {
 			tr.store.Set("/test/key", "1")
+		},
+	},
+	templateTest{
+		desc: "add float test",
+		toml: `
+[template]
+src = "test.conf.tmpl"
+dest = "./tmp/test.conf"
+keys = [
+    "/test/key",
+]
+`,
+		tmpl: `
+{{with get "/test/key"}}
+key: {{base .Key}}
+val: {{add .Value 1}}
+{{end}}
+`,
+		expected: `
+
+key: key
+val: 2
+
+`,
+		updateStore: func(tr *TemplateResource) {
+			tr.store.Set("/test/key", "1.0")
 		},
 	},
 	templateTest{
