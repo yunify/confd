@@ -361,6 +361,22 @@ hosts:{{$hosts := getvs "/test/data/*/id"}}
 {{toYaml $hosts}}
 ```
 
+### base64Encode
+
+base64 encoding
+
+```
+{{getv "/test/data/password" |base64Encode }}
+```
+
+### base64Decode
+
+base64 decoding
+
+```
+{{getv "/test/data/data" |base64Decode }}
+```
+
 ## Example Usage
 
 ```Bash

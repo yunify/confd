@@ -1,6 +1,7 @@
 package template
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -458,4 +459,33 @@ func ToYaml(v interface{}) (string, error) {
 		return "", err
 	}
 	return string(b), nil
+}
+
+func Base64Encode(v interface{}) (string, error) {
+	var input []byte
+	s, ok := v.(string)
+	if ok {
+		input = []byte(s)
+	} else {
+		b, ok := v.([]byte)
+		if ok {
+			input = b
+		}
+	}
+	if input != nil {
+		return base64.StdEncoding.EncodeToString(input), nil
+	}
+	return "", fmt.Errorf("unsupported type %s", reflect.ValueOf(v).Kind().String())
+}
+
+func Base64Decode(v interface{}) (string, error) {
+	var input string
+	s, ok := v.(string)
+	if ok {
+		input = s
+	} else {
+		return "", fmt.Errorf("unsupported type %s", reflect.ValueOf(v).Kind().String())
+	}
+	r, err := base64.StdEncoding.DecodeString(input)
+	return string(r), err
 }

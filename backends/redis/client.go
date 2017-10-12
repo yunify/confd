@@ -3,10 +3,10 @@ package redis
 import (
 	"fmt"
 	"github.com/garyburd/redigo/redis"
+	"github.com/kelseyhightower/confd/log"
 	"os"
 	"strings"
 	"time"
-	"github.com/kelseyhightower/confd/log"
 )
 
 // Client is a wrapper around the redis client
@@ -28,7 +28,7 @@ func tryConnect(machines []string, password string) (redis.Conn, error) {
 			network = "unix"
 		}
 		log.Debug(fmt.Sprintf("Trying to connect to redis node %s", address))
-		
+
 		dialops := []redis.DialOption{
 			redis.DialConnectTimeout(time.Second),
 			redis.DialReadTimeout(time.Second),
@@ -58,8 +58,8 @@ func (c *Client) connectedClient() (redis.Conn, error) {
 
 		resp, err := c.client.Do("PING")
 		if (err != nil && err == redis.ErrNil) || resp != "PONG" {
-			log.Error(fmt.Sprintf("Existing redis connection no longer usable. " +
-			    "Will try to re-establish. Error: %s", err.Error()))
+			log.Error(fmt.Sprintf("Existing redis connection no longer usable. "+
+				"Will try to re-establish. Error: %s", err.Error()))
 			c.client = nil
 		}
 	}
@@ -80,7 +80,7 @@ func (c *Client) connectedClient() (redis.Conn, error) {
 // It returns an error if a connection to the cluster cannot be made.
 func NewRedisClient(machines []string, password string) (*Client, error) {
 	var err error
-	clientWrapper := &Client{ machines : machines, password: password, client: nil }
+	clientWrapper := &Client{machines: machines, password: password, client: nil}
 	clientWrapper.client, err = tryConnect(machines, password)
 	return clientWrapper, err
 }

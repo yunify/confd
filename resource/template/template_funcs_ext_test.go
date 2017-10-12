@@ -1,12 +1,13 @@
 package template
 
 import (
-	"github.com/kelseyhightower/memkv"
 	"path"
 	"reflect"
 	"runtime"
 	"testing"
 	"time"
+
+	"github.com/kelseyhightower/memkv"
 )
 
 type tstCompareType int
@@ -58,6 +59,32 @@ val: 2
 `,
 		updateStore: func(tr *TemplateResource) {
 			tr.store.Set("/test/key", "1")
+		},
+	},
+	templateTest{
+		desc: "add float test",
+		toml: `
+[template]
+src = "test.conf.tmpl"
+dest = "./tmp/test.conf"
+keys = [
+    "/test/key",
+]
+`,
+		tmpl: `
+{{with get "/test/key"}}
+key: {{base .Key}}
+val: {{add .Value 1}}
+{{end}}
+`,
+		expected: `
+
+key: key
+val: 2
+
+`,
+		updateStore: func(tr *TemplateResource) {
+			tr.store.Set("/test/key", "1.0")
 		},
 	},
 	templateTest{
@@ -665,8 +692,11 @@ func TestToJsonAndYaml(t *testing.T) {
 		{[]string{"a1", "b1"}, false, `["a1","b1"]`, "- a1\n- b1\n"},
 		{"a1", false, `"a1"`, "a1\n"},
 		{1, false, "1", "1\n"},
-		{struct {Name string}{Name:"test"}, false, `{"Name":"test"}`, "name: test\n"},
-		{struct {Name string; Addr []string}{Name:"test", Addr: []string{"a1", "a2"}}, false, `{"Name":"test","Addr":["a1","a2"]}`,
+		{struct{ Name string }{Name: "test"}, false, `{"Name":"test"}`, "name: test\n"},
+		{struct {
+			Name string
+			Addr []string
+		}{Name: "test", Addr: []string{"a1", "a2"}}, false, `{"Name":"test","Addr":["a1","a2"]}`,
 			`name: test
 addr:
 - a1
@@ -700,6 +730,65 @@ addr:
 			}
 			if result != this.expectYaml {
 				t.Errorf("[%d] ToYaml [%v] got %v but expected %v", i, this.input, result, this.expectYaml)
+			}
+		}
+	}
+}
+
+func TestBase64Encode(t *testing.T) {
+	for i, this := range []struct {
+		input  interface{}
+		err    bool
+		expect string
+	}{
+		{"", false, ""},
+		{"aaa", false, "YWFh"},
+		{[]byte("aaa"), false, "YWFh"},
+		{"user:123Abc", false, "dXNlcjoxMjNBYmM="},
+		{"user:\n123Abc", false, "dXNlcjoKMTIzQWJj"},
+		{struct{}{}, true, ""},
+	} {
+		result, err := Base64Encode(this.input)
+		if this.err {
+			if err == nil {
+				t.Errorf("[%d] Base64Encode didn't return an expected error", i)
+			}
+		} else {
+			if err != nil {
+				t.Errorf("[%d] failed: %s", i, err)
+				continue
+			}
+			if !reflect.DeepEqual(result, this.expect) {
+				t.Errorf("[%d] Base64Encode [%v] got %v but expected %v", i, this.input, result, this.expect)
+			}
+		}
+	}
+}
+
+func TestBase64Decode(t *testing.T) {
+	for i, this := range []struct {
+		input  interface{}
+		err    bool
+		expect string
+	}{
+		{"", false, ""},
+		{"YWFh", false, "aaa"},
+		{"dXNlcjoxMjNBYmM=", false, "user:123Abc"},
+		{"dXNlcjoKMTIzQWJj", false, "user:\n123Abc"},
+		{struct{}{}, true, ""},
+	} {
+		result, err := Base64Decode(this.input)
+		if this.err {
+			if err == nil {
+				t.Errorf("[%d] Base64Decode didn't return an expected error", i)
+			}
+		} else {
+			if err != nil {
+				t.Errorf("[%d] failed: %s", i, err)
+				continue
+			}
+			if !reflect.DeepEqual(result, this.expect) {
+				t.Errorf("[%d] Base64Decode [%v] got %v but expected %v", i, this.input, result, this.expect)
 			}
 		}
 	}
