@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/kelseyhightower/confd/log"
 	"io/ioutil"
 	"math/rand"
 	"net/http"
@@ -14,6 +13,8 @@ import (
 	"strings"
 	"sync/atomic"
 	"time"
+
+	"github.com/kelseyhightower/confd/log"
 )
 
 type Connection struct {
@@ -68,6 +69,7 @@ func NewMetadClient(backendNodes []string) (*Client, error) {
 			url: url,
 			httpClient: &http.Client{
 				Transport: transport,
+				Timeout:   10 * time.Second,
 			},
 			transport: transport,
 		}
