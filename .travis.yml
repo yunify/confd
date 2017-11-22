@@ -1,87 +1,57 @@
 language: go
 go:
-  - 1.7
+- 1.9.x
 env:
-  - VAULT_ADDR='http://127.0.0.1:8200'
+  global:
+    - VAULT_ADDR='http://127.0.0.1:8200'
+    - secure: "uPNJI3p64xWTyZ0/83ftYLEdIt7WdBvNa++ZD8xkAyjRbPZbbkHVQpUq9JY92JGNyG1Wmjf4tRv6YdhPVU70UjzySm39ir3/p3tmvBcFynvLdSxjhPGvjbWyb18qz/8zv+K+xY/NWWTKPskVAmFa31kUWR2eAUcBnoWiYi745VUJ3FAzbA1IXsM1fSD4Z5wAaj/ygmmxDMSLTwKng4T5i1gcC1zn1nHW6Rzxtx2ulIETTJSESI+vZtN1zArsHoXKGzLslMnxbZYvt43TIof/LKoURmnveyFDRZ4bL4hJ70PZLXLmsgmySOFvpo9kCMsBHi+xc1ds5bh+FoJjtB92xYv0mDKPNrbbCvY4P9YiYbsJgVOeQ0+LbplQDb1CVAthT6m+ZJOf3XsWzQepQjT6M62m7KU9Jk90jk66mWT2+hM+5tNO9yFQPZ3GiYDbcrb8l6pfeufS0eBYHn/4ECuHDIkz6D8dAuC3UvPib37MAgjp1APBPA6OTCucqM2N1rbjzA/8+y4DVTxaUaui2dqSad0mmeo8rEYUIfQ7xGpFkB24pVo0/FByuIEvT/6TdUw7n4MdMCU5VYsWl0hGj5EewJTc63vSHcp6uzlD62QZWdxBRxMenvduuYpFJ6Pd5OWCDWt6wggtIrJLsOdbA8zVu+WQYAb3Mc44wpcIJs5ZoyU="
 services:
-  - redis
-  - docker
+- redis
+- docker
 before_install:
-  # install consul
-#  - wget https://releases.hashicorp.com/consul/0.6.3/consul_0.6.3_linux_amd64.zip
-#  - unzip consul_0.6.3_linux_amd64.zip
-#  - sudo mv consul /bin/
-#  - consul agent -server -bootstrap-expect 1 -data-dir /tmp/consul &
-#  # install etcd
-#  - wget https://github.com/coreos/etcd/releases/download/v2.2.5/etcd-v2.2.5-linux-amd64.tar.gz
-#  - tar xzf etcd-v2.2.5-linux-amd64.tar.gz
-#  - sudo mv etcd-v2.2.5-linux-amd64/etcd /bin/
-#  - etcd &
-#  # install DynamoDB
-#  - mkdir /tmp/dynamodb
-#  - wget -O - http://dynamodb-local.s3-website-us-west-2.amazonaws.com/dynamodb_local_latest | tar xz --directory /tmp/dynamodb
-#  - java -Djava.library.path=/tmp/dynamodb/DynamoDBLocal_lib -jar /tmp/dynamodb/DynamoDBLocal.jar -inMemory &
-#  # Install rancher metadata
-#  - wget https://github.com/rancher/rancher-metadata/releases/download/v0.1.0/rancher-metadata.tar.gz
-#  - mkdir -p ./rancher-metadata
-#  - tar xzf rancher-metadata.tar.gz --strip-components=1 -C ./rancher-metadata
-#  - sudo mv ./rancher-metadata/bin/rancher-metadata /bin/
-#  # Install vault
-#  - wget https://releases.hashicorp.com/vault/0.4.1/vault_0.4.1_linux_amd64.zip
-#  - unzip vault_0.4.1_linux_amd64.zip
-#  - sudo mv vault /bin/
-#  - vault server -dev &
-#  # Install zookeeper
-#  - wget http://www.eu.apache.org/dist/zookeeper/zookeeper-3.4.8/zookeeper-3.4.8.tar.gz
-#  - tar xzf zookeeper-3.4.8.tar.gz
-#  - mkdir /tmp/zookeeper && cp integration/zookeeper/zoo.cfg zookeeper-3.4.8/conf/zoo.cfg
-#  - zookeeper-3.4.8/bin/zkServer.sh start
-  # Install metad
-  - wget https://github.com/yunify/metad/releases/download/v1.2.1/metad-linux-amd64.tar.gz
-  - tar -zxvf metad-linux-amd64.tar.gz
-  - sudo mv metad /bin/
-  # mv repo
-  - echo $PWD
-  - mkdir -p $GOPATH/src/github.com/kelseyhightower/
-  - mv $GOPATH/src/github.com/yunify/confd $GOPATH/src/github.com/kelseyhightower/
-  - cd $GOPATH/src/github.com/kelseyhightower/confd/
-  - echo $PWD
+- wget https://github.com/yunify/metad/releases/download/v1.2.1/metad-linux-amd64.tar.gz
+- tar -zxvf metad-linux-amd64.tar.gz
+- sudo mv metad /bin/
+- echo $PWD
+- mkdir -p $GOPATH/src/github.com/kelseyhightower/
+- mv $GOPATH/src/github.com/yunify/confd $GOPATH/src/github.com/kelseyhightower/
+- cd $GOPATH/src/github.com/kelseyhightower/confd/
+- echo $PWD
 install:
-  - sudo pip install awscli
-  - go get golang.org/x/tools/cmd/cover
-  - ./build
-  - sudo ./install
+- sudo pip install awscli
+- go get golang.org/x/tools/cmd/cover
+- "./build"
+- sudo ./install
 script:
-  - ./test
-#  - bash integration/consul/test.sh
-#  - bash integration/env/test.sh
-#  - bash integration/etcd/test.sh
-#  - bash integration/redis/test.sh
-#  - bash integration/rancher/test.sh
-#  - bash integration/vault/test.sh
-#  - bash integration/zookeeper/test.sh
-#  - bash integration/dynamodb/test.sh
-  - bash integration/metad/test.sh
+- "./test"
+- bash integration/metad/test.sh
 before_deploy:
-    - "./release"
+- "./release"
 deploy:
-    provider: releases
-    skip_cleanup: true
-    api_key:
-        secure: cakAvK9GshpNlvRPCcSEd9vxePX3nOv5DJTLxlxXD/xZb4q8+Z5PfFd+X+S1va8wJ2quX6wh2RYchQ9D0tMtg+GlcG7Re81A7u5a7IBdRnW4+aO+6rDD5zmLUMyN/1dHGMRFeRTEAGSpfZbE3QvtGMYQcbTCOsaVgytPBxxut/RPIRDS2RsvZhyazrnRND9lFWNag4KwcijAGmFeo1nlGgNFZgmcTFW8C1yCdCYX2IRdQF74HOaRb/SfFBqRExSRuwJMHc8PIK09Mn3zN/jTEAxbZ9q8u4wC9p7xdogicid/ye4mtW8U9T9Y2VEJdokmL6mAShMFTsQLNrP99aWYXItdMRm5LT4CpxBSmWc43v6jMwV0HXx6/md/S4SRyaQdjbY3DsHMVLSQYqFKxq84VV5xNMHf4ZBADlzDc5Zx2CDUspmiPWlFE8rATXBPRHBj5RsKoblsNUwu/HvhnZsRI/GFichAWN4bg3gA8JF4IfOi+YcdhyYJfQsCfAaeqPryzwmcQJQ3LKqTMOS8jZtaOUxeT2aXN8Antrlb+6p2JyCtVfWhzjQIH/SuoGFYpvVJYGwk3W4bwaKqlH98WmgLj4VwUF4/nMz2HRCCA2rLq+2Y036SjQJblslBmeB6i+kcS4pnUELeLoO0M3HHvzZYnxi/6CfOYMznzH63xlp6UWo=
-    file:
-        - "bin/linux/confd-linux-amd64.tar.gz"
-        - "bin/darwin/confd-darwin-amd64.tar.gz"
-        - "bin/alpine/confd-alpine-amd64.tar.gz"
-        - "bin/windows/confd-windows-386.zip"
-    on:
-        repo: yunify/confd
-        tags: true
+  provider: releases
+  skip_cleanup: true
+  api_key:
+    secure: 0qgB5sebOrFa5kkE2wE8UsVwaSsXYOtHtGOuG+tfzTQYzvFwy68uQL3xyZOf6tlpzxNWEmKTwq26AUF6GOV5s0qeCQxa6M1yGctexsRCbYW1T3yxSIod/kLrxWXNeJRSKIakDxG8md7KfO+gYNqsLSp0WiWyed0RM7LspTxedGpCBniSC8H8OBLmXfMBhz6+qbuPCNC3VT3lcGHWVSJkD211OYotcHpZI0LyOYptMC9cAnfPG1gUJJUbt4uRo/7PlWOXWfoxWN41rPge1zAKY/wqUI0N2KFaM0HqY/bva/hWcY7/dkAFn4b6qnK3zZj8ydkLYgUw5a5MVGQGd578XE72Hs7JPVzSQEPJwCKeenEsrNi+7F9Mm7LSqOp64/YMiM4/BeSvwwiPJ4gB1bwukFn+zxli/FUxtOQh+zIMnvqWDQRCAgl0fpFcOMwEYjIQs3xjDZZs5gnP4PEdLypRLBj2pbofZTvjOFCsAJA6Vpdyxbi6Cyqi+2XzLYEzJxyJCEImyivxfR/rjRcl6Dn/lM/pRdxP6s+CszPVsVr9t62lNiHX+e1YNBBRlBnbtJNu1scOWZpgtS6wv3GEKSHJe1NFdSjMT/0u+S4AHz2QkXS0om+dnRxG3EXR+mx7r6bdVP/9E/DiPTkPU22WL5fExip+TnsUgp9KB/c9LMFAw/w=
+  file:
+  - bin/linux/confd-linux-amd64.tar.gz
+  - bin/darwin/confd-darwin-amd64.tar.gz
+  - bin/alpine/confd-alpine-amd64.tar.gz
+  - bin/windows/confd-windows-386.zip
+  on:
+    repo: yunify/confd
+    tags: true
+after_deploy:
+- git config --global user.name 'martinyunify'
+- git config --global user.email martinfan@yunify.com
+- git clone https://github.com/qingCloudAppcenter/appcenteragent
+- cp -f bin/windows/confd.exe appcenteragent/app-agent-windows-386/bin/confd.exe
+- cp -f bin/linux/confd appcenteragent/app-agent-linux-amd64/bin/confd
+- cd appcenteragent; git add .; git commit -m "update confd"; git push --quiet "https://${GITHUB_TOKEN}@github.com/QingCloudAppcenter/AppcenterAgent" master:master
 
 notifications:
   webhooks:
     urls:
-      - https://webhooks.gitter.im/e/fbff60722b1e98fcdb93
-    on_success: change  # options: [always|never|change] default: always
-    on_failure: always  # options: [always|never|change] default: always
-    on_start: never     # options: [always|never|change] default: always
+    - https://webhooks.gitter.im/e/fbff60722b1e98fcdb93
+    on_success: change
+    on_failure: always
+    on_start: never
