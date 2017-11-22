@@ -65,10 +65,8 @@ func NewMetadClient(backendNodes []string) (*Client, error) {
 	for _, backendNode := range backendNodes {
 		url := "http://" + backendNode
 		connection := &Connection{
-			url: url,
-			httpClient: &http.Client{
-				Transport: nil,
-			},
+			url:        url,
+			httpClient: &http.Client{},
 		}
 		connections.Value = connection
 		connections = connections.Next()
