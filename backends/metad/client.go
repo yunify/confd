@@ -2,10 +2,10 @@ package metad
 
 import (
 	"container/ring"
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/kelseyhightower/confd/log"
 	"io/ioutil"
 	"math/rand"
 	"net/http"
@@ -14,11 +14,12 @@ import (
 	"strings"
 	"sync/atomic"
 	"time"
+
+	"github.com/kelseyhightower/confd/log"
 )
 
 type Connection struct {
 	url        string
-	transport  *http.Transport
 	httpClient *http.Client
 	waitIndex  uint64
 	errTimes   uint32
@@ -63,13 +64,9 @@ func NewMetadClient(backendNodes []string) (*Client, error) {
 	connections := ring.New(len(backendNodes))
 	for _, backendNode := range backendNodes {
 		url := "http://" + backendNode
-		transport := &http.Transport{}
 		connection := &Connection{
-			url: url,
-			httpClient: &http.Client{
-				Transport: transport,
-			},
-			transport: transport,
+			url:        url,
+			httpClient: &http.Client{},
 		}
 		connections.Value = connection
 		connections = connections.Next()
@@ -186,17 +183,18 @@ func (c *Client) WatchPrefix(prefix string, keys []string, waitIndex uint64, sto
 
 	done := make(chan struct{})
 	defer close(done)
-
+	ctx, cancel := context.WithCancel(context.Background())
 	req, err := http.NewRequest("GET", fmt.Sprintf("%s%s?wait=true&prev_version=%d", conn.url, prefix, waitIndex), nil)
 	if err != nil {
 		return conn.waitIndex, err
 	}
-	req.Header.Set("Accept", "application/json")
 
+	req.Header.Set("Accept", "application/json")
+	req = req.WithContext(ctx)
 	go func() {
 		select {
 		case <-stopChan:
-			conn.transport.CancelRequest(req)
+			cancel()
 		case <-done:
 			return
 		}
