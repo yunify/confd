@@ -68,8 +68,8 @@ deploy:
     provider: releases
     skip_cleanup: true
     api_key:
-        secure: cakAvK9GshpNlvRPCcSEd9vxePX3nOv5DJTLxlxXD/xZb4q8+Z5PfFd+X+S1va8wJ2quX6wh2RYchQ9D0tMtg+GlcG7Re81A7u5a7IBdRnW4+aO+6rDD5zmLUMyN/1dHGMRFeRTEAGSpfZbE3QvtGMYQcbTCOsaVgytPBxxut/RPIRDS2RsvZhyazrnRND9lFWNag4KwcijAGmFeo1nlGgNFZgmcTFW8C1yCdCYX2IRdQF74HOaRb/SfFBqRExSRuwJMHc8PIK09Mn3zN/jTEAxbZ9q8u4wC9p7xdogicid/ye4mtW8U9T9Y2VEJdokmL6mAShMFTsQLNrP99aWYXItdMRm5LT4CpxBSmWc43v6jMwV0HXx6/md/S4SRyaQdjbY3DsHMVLSQYqFKxq84VV5xNMHf4ZBADlzDc5Zx2CDUspmiPWlFE8rATXBPRHBj5RsKoblsNUwu/HvhnZsRI/GFichAWN4bg3gA8JF4IfOi+YcdhyYJfQsCfAaeqPryzwmcQJQ3LKqTMOS8jZtaOUxeT2aXN8Antrlb+6p2JyCtVfWhzjQIH/SuoGFYpvVJYGwk3W4bwaKqlH98WmgLj4VwUF4/nMz2HRCCA2rLq+2Y036SjQJblslBmeB6i+kcS4pnUELeLoO0M3HHvzZYnxi/6CfOYMznzH63xlp6UWo=
-    file:
+        secure: "ByY8NEdSfI3GmoDnr+HiaRDROzDaKiW8dnOOQvKbiiQE8Hy/L6rbBqVXo+ENthZhsdAaKFwu/A3xoNZCRRibnVl4rYyuOhTwqub3zuWUkE8QH/+a7cWdXkgB2/gMLtdo7b/hbh7G3koERRfTnbsJD/7gOmCbFpIIBFcY3Z7R/bghMXTgweuUGlFmXF5mIMwVIJDwES5Z54V/Uwn9LcZsNeaoYJGL1/a8ycOXU8KOHqrVFBTYzOkt3MHdy2is4pT7UDeQu/9WrYVQDsV8Ao4cMMrSmtOCwdFRU9HUbYq6/+e+Lh+h9hZlnstiUMYPIxbnei7dP1xNwZ/Sw+s5P+y2jc0jkPf+tUdsaofinhR4qvS2vcuT52zTMJQSr2ErWv215YC6ejrLz2KbKYw1Ovn123wAXes9mB5u5U0SctUXDMpiObPw4zsjIxp/JPHbQ4xpPIZj5qYaqu7y8vPoMC1X+6JfZcLAHcmaApI6Rol5FZTkwP2t2soXTFUB9cMIEFdzI63Hk9F67z1KY5BlCssukf+LM+m4g3d2ROrO83LBT5ckGT+sC8X+6Y6X/RNsPuJ/FBg3H3aR7ATpzoTH8prsB89BARsx3o0eg3jYX+9zodws5Wddpr/EP5nPuQOQNyyrNR8xtcO1B7HrKVzAllsLnksX8t7SSPgwyMrkXkIRiSg="
+        file:
         - "bin/linux/confd-linux-amd64.tar.gz"
         - "bin/darwin/confd-darwin-amd64.tar.gz"
         - "bin/alpine/confd-alpine-amd64.tar.gz"
