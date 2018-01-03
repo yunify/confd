@@ -33,6 +33,7 @@ func (c *Connection) testConnection() error {
 		if _, err = c.makeMetaDataRequest("/"); err != nil {
 			time.Sleep(i)
 		} else {
+			log.Error("failed to connect to $s, please check your network connection.", c.url)
 			return nil
 		}
 	}
@@ -65,8 +66,11 @@ func NewMetadClient(backendNodes []string) (*Client, error) {
 	for _, backendNode := range backendNodes {
 		url := "http://" + backendNode
 		connection := &Connection{
-			url:        url,
-			httpClient: &http.Client{},
+			url: url,
+			httpClient: &http.Client{
+				Transport: http.DefaultTransport,
+				Timeout:   30 * time.Second,
+			},
 		}
 		connections.Value = connection
 		connections = connections.Next()
@@ -206,6 +210,7 @@ func (c *Client) WatchPrefix(prefix string, keys []string, waitIndex uint64, sto
 		defer resp.Body.Close()
 	}
 	if err != nil {
+		log.Error("failed to connect to metad when watch prefix")
 		atomic.AddUint32(&conn.errTimes, 1)
 		return conn.waitIndex, err
 	}
