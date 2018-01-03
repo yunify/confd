@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"math/rand"
+	"net"
 	"net/http"
 	"reflect"
 	"strconv"
@@ -68,8 +69,28 @@ func NewMetadClient(backendNodes []string) (*Client, error) {
 		connection := &Connection{
 			url: url,
 			httpClient: &http.Client{
-				Transport: http.DefaultTransport,
-				Timeout:   30 * time.Second,
+				Transport: &http.Transport{
+					Proxy: http.ProxyFromEnvironment,
+					DialContext: func(ctx context.Context, network, addr string) (net.Conn, error) {
+						dial := &net.Dialer{
+							Timeout:   30 * time.Second,
+							KeepAlive: 30 * time.Second,
+							DualStack: true,
+						}
+						conn, err := dial.DialContext(ctx, network, addr)
+						if err != nil {
+							log.Error("Failed to connect to metad,%v", err)
+							return conn, err
+						}
+						log.Debug("Connection is created.%s", addr)
+						return conn, err
+					},
+					MaxIdleConns:          100,
+					IdleConnTimeout:       90 * time.Second,
+					TLSHandshakeTimeout:   10 * time.Second,
+					ExpectContinueTimeout: 1 * time.Second,
+				},
+				Timeout: 30 * time.Second,
 			},
 		}
 		connections.Value = connection
