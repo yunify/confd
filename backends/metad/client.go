@@ -71,20 +71,11 @@ func NewMetadClient(backendNodes []string) (*Client, error) {
 			httpClient: &http.Client{
 				Transport: &http.Transport{
 					Proxy: http.ProxyFromEnvironment,
-					DialContext: func(ctx context.Context, network, addr string) (net.Conn, error) {
-						dial := &net.Dialer{
-							Timeout:   30 * time.Second,
-							KeepAlive: 30 * time.Second,
-							DualStack: true,
-						}
-						conn, err := dial.DialContext(ctx, network, addr)
-						if err != nil {
-							log.Error("Failed to connect to metad,%v", err)
-							return conn, err
-						}
-						log.Debug("Connection is created.%s", addr)
-						return conn, err
-					},
+					DialContext: (&net.Dialer{
+						Timeout:   30 * time.Second,
+						KeepAlive: 30 * time.Second,
+						DualStack: true,
+					}).DialContext,
 					MaxIdleConns:          100,
 					IdleConnTimeout:       90 * time.Second,
 					TLSHandshakeTimeout:   10 * time.Second,
