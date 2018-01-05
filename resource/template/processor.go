@@ -95,12 +95,14 @@ func (p *watchProcessor) monitorPrefix(t *TemplateResource) {
 	for {
 		index, err := t.storeClient.WatchPrefix(t.Prefix, keys, t.lastIndex, p.stopChan)
 		if err != nil {
+			log.Error("Failed to watch prefix %v", err)
 			p.errChan <- err
 			// Prevent backend errors from consuming all resources.
 			time.Sleep(time.Second * 2)
 			continue
 		}
 		t.lastIndex = index
+		log.Info("start to watch prefix")
 		if err := t.process(); err != nil {
 			p.errChan <- err
 		}
