@@ -34,7 +34,7 @@ func (c *Connection) testConnection() error {
 		if _, err = c.makeMetaDataRequest("/"); err != nil {
 			time.Sleep(i)
 		} else {
-			log.Error("failed to connect to $s, please check your network connection.", c.url)
+			log.Error("failed to connect to %s, please check your network connection.", c.url)
 			return nil
 		}
 	}
