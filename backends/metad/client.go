@@ -31,12 +31,11 @@ func (c *Connection) testConnection() error {
 	maxTime := 15 * time.Second
 
 	for i := 1 * time.Second; i < maxTime; i *= time.Duration(2) {
-		if _, err = c.makeMetaDataRequest("/"); err != nil {
-			time.Sleep(i)
-		} else {
-			log.Error("failed to connect to %s, please check your network connection.", c.url)
-			return nil
+		if _, err = c.makeMetaDataRequest("/"); err == nil {
+			return nil // OK
 		}
+
+		time.Sleep(i)
 	}
 	return err
 }
