@@ -26,20 +26,6 @@ type Connection struct {
 	errTimes   uint32
 }
 
-func (c *Connection) testConnection() error {
-	var err error
-	maxTime := 15 * time.Second
-
-	for i := 1 * time.Second; i < maxTime; i *= time.Duration(2) {
-		if _, err = c.makeMetaDataRequest("/"); err == nil {
-			return nil // OK
-		}
-
-		time.Sleep(i)
-	}
-	return err
-}
-
 func (c *Connection) makeMetaDataRequest(path string) ([]byte, error) {
 	req, err := http.NewRequest("GET", strings.Join([]string{c.url, path}, ""), nil)
 	if err != nil {
@@ -98,31 +84,48 @@ func NewMetadClient(backendNodes []string) (*Client, error) {
 }
 
 func (c *Client) selectConnection() error {
-	//random start
-	if c.current == nil {
-		rand.Seed(time.Now().Unix())
-		r := rand.Intn(c.connections.Len())
-		c.connections = c.connections.Move(r)
-	}
-	c.connections = c.connections.Next()
-	conn := c.connections.Value.(*Connection)
-	startConn := conn
-	err := conn.testConnection()
-	for err != nil {
-		log.Error("Connection to [%s], error: [%s]", conn.url, err.Error())
-		c.connections = c.connections.Next()
-		conn = c.connections.Value.(*Connection)
-		if conn == startConn {
-			return errors.New("Fail to connect any backend.")
+	var err error
+	maxTime := 15 * time.Second
+	i := 1 * time.Second
+	for ; i < maxTime; i *= time.Duration(2) {
+
+		//random start
+		if c.current == nil {
+			rand.Seed(time.Now().Unix())
+			r := rand.Intn(c.connections.Len())
+			c.connections = c.connections.Move(r)
 		}
-		err = conn.testConnection()
+		c.connections = c.connections.Next()
+		conn := c.connections.Value.(*Connection)
+		startConn := conn
+
+		//iterate through connection
+		_, err = conn.makeMetaDataRequest("/")
+		for err != nil {
+			log.Error("Connection to [%s], error: [%s]", conn.url, err.Error())
+			c.connections = c.connections.Next()
+			conn = c.connections.Value.(*Connection)
+			if conn == startConn {
+				break
+			}
+			_, err = conn.makeMetaDataRequest("/")
+		}
+		if err == nil {
+			//found available conn
+			if c.current != nil {
+				atomic.StoreUint32(&c.current.errTimes, 0)
+			}
+			c.current = conn
+			break
+		}
+		time.Sleep(i)
 	}
-	if c.current != nil {
-		atomic.StoreUint32(&c.current.errTimes, 0)
+	if i < maxTime {
+		log.Info("Using Metad URL: " + c.current.url)
+		return nil
+	} else {
+		return fmt.Errorf("Fail to connect any backend.")
 	}
-	c.current = conn
-	log.Info("Using Metad URL: " + c.current.url)
-	return nil
 }
 
 func (c *Client) GetValues(keys []string) (map[string]string, error) {
