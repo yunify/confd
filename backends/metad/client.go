@@ -98,7 +98,7 @@ func (c *Client) selectConnection() error {
 		time.Sleep(i)
 	}
 	if i >= maxTime {
-		return fmt.Errorf("Fail to connect any backend.")
+		return fmt.Errorf("fail to connect any backend.")
 	}
 	log.Info("Using Metad URL: " + c.current.url)
 	return nil
@@ -116,7 +116,7 @@ func (c *Client) testConnection() (*Connection, error) {
 	startConn := conn
 	_, err := conn.makeMetaDataRequest("/")
 	for err != nil {
-		log.Error("Connection to [%s], error: [%s]", conn.url, err.Error())
+		log.Error("connection to [%s], error: [%v]", conn.url, err)
 		c.connections = c.connections.Next()
 		conn = c.connections.Value.(*Connection)
 		if conn == startConn {
