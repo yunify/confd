@@ -84,33 +84,10 @@ func NewMetadClient(backendNodes []string) (*Client, error) {
 }
 
 func (c *Client) selectConnection() error {
-	var err error
 	maxTime := 15 * time.Second
 	i := 1 * time.Second
 	for ; i < maxTime; i *= time.Duration(2) {
-
-		//random start
-		if c.current == nil {
-			rand.Seed(time.Now().Unix())
-			r := rand.Intn(c.connections.Len())
-			c.connections = c.connections.Move(r)
-		}
-		c.connections = c.connections.Next()
-		conn := c.connections.Value.(*Connection)
-		startConn := conn
-
-		//iterate through connection
-		_, err = conn.makeMetaDataRequest("/")
-		for err != nil {
-			log.Error("Connection to [%s], error: [%s]", conn.url, err.Error())
-			c.connections = c.connections.Next()
-			conn = c.connections.Value.(*Connection)
-			if conn == startConn {
-				break
-			}
-			_, err = conn.makeMetaDataRequest("/")
-		}
-		if err == nil {
+		if conn, err := c.testConnection(); err == nil {
 			//found available conn
 			if c.current != nil {
 				atomic.StoreUint32(&c.current.errTimes, 0)
@@ -120,12 +97,34 @@ func (c *Client) selectConnection() error {
 		}
 		time.Sleep(i)
 	}
-	if i < maxTime {
-		log.Info("Using Metad URL: " + c.current.url)
-		return nil
-	} else {
+	if i >= maxTime {
 		return fmt.Errorf("Fail to connect any backend.")
 	}
+	log.Info("Using Metad URL: " + c.current.url)
+	return nil
+}
+
+func (c *Client) testConnection() (*Connection, error) {
+	//random start
+	if c.current == nil {
+		rand.Seed(time.Now().Unix())
+		r := rand.Intn(c.connections.Len())
+		c.connections = c.connections.Move(r)
+	}
+	c.connections = c.connections.Next()
+	conn := c.connections.Value.(*Connection)
+	startConn := conn
+	_, err := conn.makeMetaDataRequest("/")
+	for err != nil {
+		log.Error("Connection to [%s], error: [%s]", conn.url, err.Error())
+		c.connections = c.connections.Next()
+		conn = c.connections.Value.(*Connection)
+		if conn == startConn {
+			break
+		}
+		_, err = conn.makeMetaDataRequest("/")
+	}
+	return conn, err
 }
 
 func (c *Client) GetValues(keys []string) (map[string]string, error) {
