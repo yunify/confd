@@ -26,20 +26,6 @@ type Connection struct {
 	errTimes   uint32
 }
 
-func (c *Connection) testConnection() error {
-	var err error
-	maxTime := 15 * time.Second
-
-	for i := 1 * time.Second; i < maxTime; i *= time.Duration(2) {
-		if _, err = c.makeMetaDataRequest("/"); err == nil {
-			return nil // OK
-		}
-
-		time.Sleep(i)
-	}
-	return err
-}
-
 func (c *Connection) makeMetaDataRequest(path string) ([]byte, error) {
 	req, err := http.NewRequest("GET", strings.Join([]string{c.url, path}, ""), nil)
 	if err != nil {
@@ -98,6 +84,27 @@ func NewMetadClient(backendNodes []string) (*Client, error) {
 }
 
 func (c *Client) selectConnection() error {
+	maxTime := 15 * time.Second
+	i := 1 * time.Second
+	for ; i < maxTime; i *= time.Duration(2) {
+		if conn, err := c.testConnection(); err == nil {
+			//found available conn
+			if c.current != nil {
+				atomic.StoreUint32(&c.current.errTimes, 0)
+			}
+			c.current = conn
+			break
+		}
+		time.Sleep(i)
+	}
+	if i >= maxTime {
+		return fmt.Errorf("fail to connect any backend.")
+	}
+	log.Info("Using Metad URL: " + c.current.url)
+	return nil
+}
+
+func (c *Client) testConnection() (*Connection, error) {
 	//random start
 	if c.current == nil {
 		rand.Seed(time.Now().Unix())
@@ -107,22 +114,17 @@ func (c *Client) selectConnection() error {
 	c.connections = c.connections.Next()
 	conn := c.connections.Value.(*Connection)
 	startConn := conn
-	err := conn.testConnection()
+	_, err := conn.makeMetaDataRequest("/")
 	for err != nil {
-		log.Error("Connection to [%s], error: [%s]", conn.url, err.Error())
+		log.Error("connection to [%s], error: [%v]", conn.url, err)
 		c.connections = c.connections.Next()
 		conn = c.connections.Value.(*Connection)
 		if conn == startConn {
-			return errors.New("Fail to connect any backend.")
+			break
 		}
-		err = conn.testConnection()
+		_, err = conn.makeMetaDataRequest("/")
 	}
-	if c.current != nil {
-		atomic.StoreUint32(&c.current.errTimes, 0)
-	}
-	c.current = conn
-	log.Info("Using Metad URL: " + c.current.url)
-	return nil
+	return conn, err
 }
 
 func (c *Client) GetValues(keys []string) (map[string]string, error) {
