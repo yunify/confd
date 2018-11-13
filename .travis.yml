@@ -1,6 +1,6 @@
 language: go
 go:
-- 1.9.x
+- "1.11"
 env:
   global:
     - VAULT_ADDR='http://127.0.0.1:8200'
