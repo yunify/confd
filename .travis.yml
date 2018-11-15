@@ -1,10 +1,10 @@
 language: go
 go:
-- "1.11"
+- '1.11'
 env:
   global:
-    - VAULT_ADDR='http://127.0.0.1:8200'
-    - secure: "uPNJI3p64xWTyZ0/83ftYLEdIt7WdBvNa++ZD8xkAyjRbPZbbkHVQpUq9JY92JGNyG1Wmjf4tRv6YdhPVU70UjzySm39ir3/p3tmvBcFynvLdSxjhPGvjbWyb18qz/8zv+K+xY/NWWTKPskVAmFa31kUWR2eAUcBnoWiYi745VUJ3FAzbA1IXsM1fSD4Z5wAaj/ygmmxDMSLTwKng4T5i1gcC1zn1nHW6Rzxtx2ulIETTJSESI+vZtN1zArsHoXKGzLslMnxbZYvt43TIof/LKoURmnveyFDRZ4bL4hJ70PZLXLmsgmySOFvpo9kCMsBHi+xc1ds5bh+FoJjtB92xYv0mDKPNrbbCvY4P9YiYbsJgVOeQ0+LbplQDb1CVAthT6m+ZJOf3XsWzQepQjT6M62m7KU9Jk90jk66mWT2+hM+5tNO9yFQPZ3GiYDbcrb8l6pfeufS0eBYHn/4ECuHDIkz6D8dAuC3UvPib37MAgjp1APBPA6OTCucqM2N1rbjzA/8+y4DVTxaUaui2dqSad0mmeo8rEYUIfQ7xGpFkB24pVo0/FByuIEvT/6TdUw7n4MdMCU5VYsWl0hGj5EewJTc63vSHcp6uzlD62QZWdxBRxMenvduuYpFJ6Pd5OWCDWt6wggtIrJLsOdbA8zVu+WQYAb3Mc44wpcIJs5ZoyU="
+  - VAULT_ADDR='http://127.0.0.1:8200'
+  - secure: uPNJI3p64xWTyZ0/83ftYLEdIt7WdBvNa++ZD8xkAyjRbPZbbkHVQpUq9JY92JGNyG1Wmjf4tRv6YdhPVU70UjzySm39ir3/p3tmvBcFynvLdSxjhPGvjbWyb18qz/8zv+K+xY/NWWTKPskVAmFa31kUWR2eAUcBnoWiYi745VUJ3FAzbA1IXsM1fSD4Z5wAaj/ygmmxDMSLTwKng4T5i1gcC1zn1nHW6Rzxtx2ulIETTJSESI+vZtN1zArsHoXKGzLslMnxbZYvt43TIof/LKoURmnveyFDRZ4bL4hJ70PZLXLmsgmySOFvpo9kCMsBHi+xc1ds5bh+FoJjtB92xYv0mDKPNrbbCvY4P9YiYbsJgVOeQ0+LbplQDb1CVAthT6m+ZJOf3XsWzQepQjT6M62m7KU9Jk90jk66mWT2+hM+5tNO9yFQPZ3GiYDbcrb8l6pfeufS0eBYHn/4ECuHDIkz6D8dAuC3UvPib37MAgjp1APBPA6OTCucqM2N1rbjzA/8+y4DVTxaUaui2dqSad0mmeo8rEYUIfQ7xGpFkB24pVo0/FByuIEvT/6TdUw7n4MdMCU5VYsWl0hGj5EewJTc63vSHcp6uzlD62QZWdxBRxMenvduuYpFJ6Pd5OWCDWt6wggtIrJLsOdbA8zVu+WQYAb3Mc44wpcIJs5ZoyU=
 services:
 - redis
 - docker
@@ -31,7 +31,7 @@ deploy:
   provider: releases
   skip_cleanup: true
   api_key:
-    secure: 0qgB5sebOrFa5kkE2wE8UsVwaSsXYOtHtGOuG+tfzTQYzvFwy68uQL3xyZOf6tlpzxNWEmKTwq26AUF6GOV5s0qeCQxa6M1yGctexsRCbYW1T3yxSIod/kLrxWXNeJRSKIakDxG8md7KfO+gYNqsLSp0WiWyed0RM7LspTxedGpCBniSC8H8OBLmXfMBhz6+qbuPCNC3VT3lcGHWVSJkD211OYotcHpZI0LyOYptMC9cAnfPG1gUJJUbt4uRo/7PlWOXWfoxWN41rPge1zAKY/wqUI0N2KFaM0HqY/bva/hWcY7/dkAFn4b6qnK3zZj8ydkLYgUw5a5MVGQGd578XE72Hs7JPVzSQEPJwCKeenEsrNi+7F9Mm7LSqOp64/YMiM4/BeSvwwiPJ4gB1bwukFn+zxli/FUxtOQh+zIMnvqWDQRCAgl0fpFcOMwEYjIQs3xjDZZs5gnP4PEdLypRLBj2pbofZTvjOFCsAJA6Vpdyxbi6Cyqi+2XzLYEzJxyJCEImyivxfR/rjRcl6Dn/lM/pRdxP6s+CszPVsVr9t62lNiHX+e1YNBBRlBnbtJNu1scOWZpgtS6wv3GEKSHJe1NFdSjMT/0u+S4AHz2QkXS0om+dnRxG3EXR+mx7r6bdVP/9E/DiPTkPU22WL5fExip+TnsUgp9KB/c9LMFAw/w=
+    secure: rZ3VU+0sz2w5rzWchg4zlDsYex3xDo2HpbLB2NOC4Fxk5N9TP+KjLIt5rV1jIsLRCFLG4Wt/kw3t3GMo/UW5CRPTwhJNg19f7LomG7/NdOveYKtSuGS4it6CwKCmlWtCWSuuksnkB9I+5DSHWHlDw3bbndKKgLAt2csgjPS24ZKiaml/KHpP/bcl9bTKsjgjeJ5eG9+vJGjTMREETs+eA3+CXThTUXWxV2L+4BR+AIwkeWliN/Yxp139D29tRh2weIpJQ5tL9vY9F0ZK0GuGBcijNfRLTAbRIH0DFFjPASU8P6zHO7mvL5f4hEUHT9wLI5RvXj4zw7+rBxmDm6zRqWlPbGRWDrhLjRcz4PmjMO1j9omBedwAGymjfn4t5G+nA+1DWV1ZVANDNfAYmzTKKgZRP2cs4xo1uDWcIdr3BKwiW96U42+xxHc7o0/qzBtNvHqf88XGyJO7B6S8FM+MgHaZnhkz9RqicRXujUEv5suAcfS7csRZaRMkPCHCG81OXrrN3R1gpWJ/nMKgxIWtsK0eWys+iLzX2wgperZ3ikPkp6C01GOfhUcrMClXoiCW3BrQfBUQ70O+ifn0ojyGRNIzs9ImtNVzPwVccYU8ZjyUtcTVSzrwWnlkzh2LSU27ikuiUPNIoGuZK69NUzaYOefLdArWVRmMUQ7TWA6pobc=
   file:
   - bin/linux/confd-linux-amd64.tar.gz
   - bin/darwin/confd-darwin-amd64.tar.gz
@@ -41,8 +41,8 @@ deploy:
     repo: yunify/confd
     tags: true
 after_deploy:
-- git config --global user.name 'martinyunify'
-- git config --global user.email martinfan@yunify.com
+- git config --global user.name 'chilianyi'
+- git config --global user.email chilianyi@126.com
 - git clone https://github.com/qingCloudAppcenter/appcenteragent
 - cp -f bin/windows/confd.exe appcenteragent/app-agent-windows-386/bin/confd.exe
 - cp -f bin/linux/confd appcenteragent/app-agent-linux-amd64/bin/confd
