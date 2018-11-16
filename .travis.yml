@@ -46,7 +46,14 @@ after_deploy:
 - git clone https://github.com/qingCloudAppcenter/appcenteragent
 - cp -f bin/windows/confd.exe appcenteragent/app-agent-windows-386/bin/confd.exe
 - cp -f bin/linux/confd appcenteragent/app-agent-linux-amd64/bin/confd
-- cd appcenteragent; git add .; git commit -m "update confd"; git push --quiet "https://${GITHUB_TOKEN}@github.com/QingCloudAppcenter/AppcenterAgent" master:master
+- cd appcenteragent; git add .; git commit -m "update confd"; git push --quiet "https://${GITHUB_TOKEN}@github.com/QingCloudAppcenter/AppcenterAgent" master:master; cd ..
+- git clone https://github.com/yunify/docker-images.git
+- cd docker-images; sed -i "s/CONFD_VERSION=.*/CONFD_VERSION=$TRAVIS_TAG/g" confd/Dockerfile; sed -i "s/CONFD_VERSION=.*/CONFD_VERSION=$TRAVIS_TAG/g" confd/env.sh; cd ..
+- cd docker-images; sed -i "s/confd-.*/confd-$TRAVIS_TAG/g" jdk/push.sh; sed -i "s/confd-.*/confd-$TRAVIS_TAG/g" jdk/build.sh; sed -i "s/confd:.*/confd:$TRAVIS_TAG/g" jdk/Dockerfile; cd ..
+- cd docker-images; git add .; git commit -m "update confd"; git push --quiet "https://${GITHUB_TOKEN}@github.com/yunify/docker-images" master:master; cd ..
+- echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin dockerhub.qingcloud.com
+- cd docker-images/confd; ./build.sh && ./push.sh; cd ../..
+- cd docker-images/jdk; ./build.sh && ./push.sh; cd ../..
 
 notifications:
   webhooks:
