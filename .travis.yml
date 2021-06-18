@@ -34,6 +34,7 @@ deploy:
     secure: qFVfJ0O7GvtbtlOK095eDj3ylsBlSoSYuByaGWD274aG2Mgax2y1gvatQhU/a2G0OWh/ch1Ruo1mvKM37EucS/2xjXhXgovQfFaaANo10HjQCd31iHJ8w3ICaIFb7VSB900Ko/XtoA472wKtllmIa0nnXU72LCYjWTcUFosYUfY/XRgvuShcrmLo/1qRqFJVen0UoV3pKe0wkCZ+ajmUCBUr3v3cInSEhlrIItoelrv5vmnXJtR5WM7WWuLK1dJbwVEvIl7Y/xc8ONapoS/wmyvHa1yk12CKugpU19+Q4gwc8jCxp/EF7h5FZzhuyvB7izxrEMy6NdfQoXZwou38YSWR/Tw5qK7XHg3e1usMoRL3I7kpm+gxUsNPTQN/IY04nclew0TSw3S8cxINIDWdjH1wyOzVvKD2+FUZ4iNPJP1jLfYl7Q9X0sLLOGe0QuU6nqHD+A8nS9zG6LIgd3BJVefTzGE4fUiZ671ceUiU6Jgom/zozQ7drpbESR64F/PyTBJ8omAmI93dhOhjOCANufkS6QTU9wWjhwFgAkjBPHylbJiS6cnASO0BbqHH5IT5vtYENGLPITkzqhAdxrbQpITe+HofDNdwWSQcbNanhkgnioBJqJnZjAamrpmSa0BpJxa/g34NurvDeASSEouPbmZvinEJo6bOiEFQ42saj7w=
   file:
   - bin/linux/confd-linux-amd64.tar.gz
+  - bin/arm64/confd-linux-arm64.tar.gz
   - bin/darwin/confd-darwin-amd64.tar.gz
   - bin/alpine/confd-alpine-amd64.tar.gz
   - bin/windows/confd-windows-386.zip
@@ -46,6 +47,7 @@ after_deploy:
 - git clone https://github.com/qingCloudAppcenter/appcenteragent
 - cp -f bin/windows/confd.exe appcenteragent/app-agent-windows-386/bin/confd.exe
 - cp -f bin/linux/confd appcenteragent/app-agent-linux-amd64/bin/confd
+- cp -f bin/arm64/confd appcenteragent/app-agent-linux-arm64/bin/confd
 - cd appcenteragent; git add .; git commit -m "update confd"; git push --quiet "https://${GITHUB_TOKEN}@github.com/QingCloudAppcenter/AppcenterAgent" master:master; cd ..
 - git clone https://github.com/yunify/docker-images.git
 - cd docker-images; sed -i "s/CONFD_VERSION=.*/CONFD_VERSION=$TRAVIS_TAG/g" confd/Dockerfile; sed -i "s/CONFD_VERSION=.*/CONFD_VERSION=$TRAVIS_TAG/g" confd/env.sh; cd ..
